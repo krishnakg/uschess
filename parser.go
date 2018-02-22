@@ -34,6 +34,7 @@ type EventEntry struct {
 	position int
 	score    float64
 	id       int
+	name     string
 	state    string
 	change   []RatingChange
 	games    []Game
@@ -162,10 +163,16 @@ func parseSectionEntry(entryStr string) EventEntry {
 
 	lines := strings.Split(entryStr, "\n")
 
-	// Process Line 1
+	/* Process Line 1
+	Col 0: Position of player
+	Col 1: Name of player
+	Col 2: Total Score of the player
+	Col 3 onwards, pair of results: (Result OpponentPosition)
+	*/
 	parts := strings.Split(lines[0], "|")
 	entry.position, err = strconv.Atoi(strings.TrimSpace(parts[0]))
 	checkErr(err)
+	entry.name = strings.Title(strings.ToLower(strings.TrimSpace(parts[1])))
 	entry.score, err = strconv.ParseFloat(strings.TrimSpace(parts[2]), 32)
 	checkErr(err)
 

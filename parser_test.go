@@ -9,7 +9,7 @@ func TestParseSectionEntryWithTwoRatings(t *testing.T) {
 	entryStr := "    1 | ANDY S PORTER                   |3.0  |W   6|W   4|W   3|\n" +
 		"   IN | 12425190 / R: 2029   ->2037     |     |     |     |     |\n" +
 		"      |            Q: 2003   ->2012     |     |     |     |     |\n"
-	expectedEntry := EventEntry{1, 3.0, 12425190, "IN",
+	expectedEntry := EventEntry{1, 3.0, 12425190, "Andy S Porter", "IN",
 		[]RatingChange{
 			{"R", "2029", "2037"},
 			{"Q", "2003", "2012"},
@@ -24,7 +24,7 @@ func TestParseSectionEntryWithTwoRatings(t *testing.T) {
 func TestParseSectionEntryWithOneRatingAndUnplayedRounds(t *testing.T) {
 	entryStr := "   21 | DR BENJAMIN KARREN              |1.0  |W   8|L  18|F    |U    |U    |U    |U    |\n" +
 		"   AZ | 13468860 / OB: 1572   ->1565    |     |B    |B    |W    |     |     |     |     |\n"
-	expectedEntry := EventEntry{21, 1.0, 13468860, "AZ",
+	expectedEntry := EventEntry{21, 1.0, 13468860, "Dr Benjamin Karren", "AZ",
 		[]RatingChange{
 			{"OB", "1572", "1565"},
 		}, []Game{
@@ -43,7 +43,7 @@ func TestParseSectionEntryWithProvisionalRating(t *testing.T) {
 	entryStr := "    8 | SHENGHAN XU                     |0.0  |L   3|L   7|L   5|L   6|L   4|\n" +
 		"   VA | 16534371 / R:  109P7 -> 110P12  |     |     |     |     |     |     |\n" +
 		"   |            Q:  109P7 -> 101P12  |     |     |     |     |     |     |\n"
-	expectedEntry := EventEntry{8, 0.0, 16534371, "VA",
+	expectedEntry := EventEntry{8, 0.0, 16534371, "Shenghan Xu", "VA",
 		[]RatingChange{
 			{"R", "109P7", "110P12"},
 			{"Q", "109P7", "101P12"},
@@ -60,7 +60,7 @@ func TestParseSectionEntryWithProvisionalRating(t *testing.T) {
 func TestParseSectionEntryForRoundRobinEntry(t *testing.T) {
 	entryStr := "    2 | THOMAS J BELKE                  |1.5  |W   4|*    |L   1|D   3|\n" +
 		"   VA | 10126550 / Q: 1778   ->1792     |     |B    |     |W    |B    |\n"
-	expectedEntry := EventEntry{2, 1.5, 10126550, "VA",
+	expectedEntry := EventEntry{2, 1.5, 10126550, "Thomas J Belke", "VA",
 		[]RatingChange{
 			{"Q", "1778", "1792"},
 		}, []Game{
@@ -75,7 +75,7 @@ func TestParseSectionEntryForRoundRobinEntry(t *testing.T) {
 func TestParseSectionEntryForNoRating(t *testing.T) {
 	entryStr := "   69 | WAYNE T FISCHER                 |0.0  |U    |U    |U    |U    |\n" +
 		"   NJ | 12894588 /                      |     |     |     |     |     |\n"
-	expectedEntry := EventEntry{69, 0.0, 12894588, "NJ",
+	expectedEntry := EventEntry{69, 0.0, 12894588, "Wayne T Fischer", "NJ",
 		[]RatingChange{
 			{"", "", ""},
 		}, []Game{
@@ -109,14 +109,20 @@ func TestParseSectionName(t *testing.T) {
 }
 
 func TestParseRating(t *testing.T) {
-	rating, games := parseRating(" 845P34 ")
+	ratingStr := " 845P34 "
+	rating, games := parseRating(ratingStr)
 	if rating != 845 && games != 34 {
-		t.Errorf("Parsing rating string %s gave %d %d", rating, games)
+		t.Errorf("Parsing rating string %s gave %d %d", ratingStr, rating, games)
 	}
 
-	rating, games = parseRating(" 845")
+	ratingStr = " 845"
+	rating, games = parseRating(ratingStr)
 	if rating != 845 && games != 0 {
-		t.Errorf("Parsing rating string %s gave %d %d", rating, games)
+		t.Errorf("Parsing rating string %s gave %d %d", ratingStr, rating, games)
 	}
 
+	rating, games = parseRating(" ")
+	if rating != 0 && games != 0 {
+		t.Errorf("Parsing empty rating string gave %d %d", rating, games)
+	}
 }
