@@ -71,12 +71,29 @@ func (stats *StatsDB) insertTournamentHistory(uscfId int, eventId string, sectio
 	checkErr(err)
 }
 
+func (stats *StatsDB) insertPlayer(uscfId int, name string, state string) {
+	insertStatement, err := stats.db.Prepare("insert into player " +
+		"(id, name, state) " +
+		"values (?, ?, ?) " +
+		"on duplicate key " +
+		"update name=?, state=?")
+	checkErr(err)
+	defer insertStatement.Close()
+
+	_, err = insertStatement.Exec(uscfId, name, state, name, state)
+	checkErr(err)
+}
+
 func (stats *StatsDB) saveEvent(event Event) {
 	stats.insertEvent(event)
 	for id, section := range event.sections {
 		stats.insertSection(id, section.name, event.id)
+		// Used to make a map of player position to USCF Id so as to use later.
 		uscfID := make(map[int]int)
 		for _, entry := range section.entries {
+			// We should write the player table first as it does not have foriegn keys and also
+			// because the player id will be used as the foriegn key in other tables.
+			stats.insertPlayer(entry.id, entry.name, entry.state)
 			for _, ratingChange := range entry.change {
 				// Currently not storing the number of games for provisional players
 				preRating, _ := parseRating(ratingChange.pre)
