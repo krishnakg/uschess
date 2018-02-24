@@ -87,6 +87,25 @@ func TestParseSectionEntryForNoRating(t *testing.T) {
 	testParseSectionEntry(t, entryStr, expectedEntry)
 }
 
+func TestParseSectionEntryForFideEventAdjustmentAndEmptyGame(t *testing.T) {
+	entryStr := "    1 | JOHN DAVID BARTHOLOMEW          |5.5  |W2048|W2175|D2672|W2226|L2606|W2263|L2502|W2344|    |\n" +
+		"   MN | 12718516 / R: 2541   ->2552     |     |     |     |     |     |     |     |     |     |     |"
+	expectedEntry := EventEntry{1, 5.5, 12718516, "John David Bartholomew", "MN",
+		[]RatingChange{
+			{"R", "2541", "2552"},
+		}, []Game{
+			{"W", 1, 0, 2048, 0},
+			{"W", 1, 0, 2175, 0},
+			{"D", 1, 0, 2672, 0},
+			{"W", 1, 0, 2226, 0},
+			{"L", 1, 0, 2606, 0},
+			{"W", 1, 0, 2263, 0},
+			{"L", 1, 0, 2502, 0},
+			{"W", 1, 0, 2344, 0},
+		}}
+	testParseSectionEntry(t, entryStr, expectedEntry)
+}
+
 // Convinience function for the above tests.
 func testParseSectionEntry(t *testing.T, entryStr string, expectedEntry EventEntry) {
 	entry := parseSectionEntry(entryStr)

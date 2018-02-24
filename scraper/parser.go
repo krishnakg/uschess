@@ -181,7 +181,10 @@ func parseSectionEntry(entryStr string) EventEntry {
 	re := regexp.MustCompile(` *([A-Z\*]) *([0-9]+)* *`)
 	for _, part := range parts[3 : len(parts)-1] {
 		result := re.FindStringSubmatch(part)
-
+		if len(result) != 3 {
+			// If the round information is empty, there is nothing to process for this round
+			continue
+		}
 		// Many entries like F, U, B, X do not need an opponent. So we will assign that as default
 		// and fetch the opponent only if it is present.
 		player2 := 0
