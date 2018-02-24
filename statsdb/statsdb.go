@@ -9,6 +9,21 @@ type StatsDB struct {
 	db *sql.DB
 }
 
+type Player struct {
+	ID    int    `json:"id,omitempty"`
+	Name  string `json:"name,omitempty"`
+	State string `json:"state,omitempty"`
+}
+
+type EventPerformance struct {
+	ID         string `json:"id,omitempty"`
+	Name       string `json:"name,omitempty"`
+	UscfID     int    `json:"uscfId,omitempty"`
+	PreRating  int    `json:"preRating,omitempty"`
+	PostRating int    `json:"postRating,omitempty"`
+	RatingType string `json:"ratingType,omitempty"`
+}
+
 func (stats *StatsDB) Open() {
 	var err error
 	dbType, dbConnectionString := utils.GetDatabaseConnectionString()
@@ -71,4 +86,27 @@ func (stats *StatsDB) InsertPlayer(uscfId int, name string, state string) {
 
 	_, err = insertStatement.Exec(uscfId, name, state, name, state)
 	utils.CheckErr(err)
+}
+
+func (stats *StatsDB) GetPlayer(uscfId int) (player Player, err error) {
+	err = stats.db.QueryRow("select name, state from player where id=?", uscfId).Scan(&player.Name, &player.State)
+	player.ID = uscfId
+	return
+}
+
+func (stats *StatsDB) GetEvents(uscfId int) (performances []EventPerformance, err error) {
+	rows, err := stats.db.Query("select e.id, e.name, th.uscf_id, th.pre_rating, th.post_rating, th.rating_type "+
+		"from event e, tournament_history th where th.event_id=e.id and th.uscf_id=? order by e.id desc", uscfId)
+	utils.CheckErr(err)
+	defer rows.Close()
+
+	for rows.Next() {
+		var performance EventPerformance
+		if err := rows.Scan(&performance.ID, &performance.Name, &performance.UscfID, &performance.PreRating, &performance.PostRating, &performance.RatingType); err != nil {
+			utils.CheckErr(err)
+			return performances, err
+		}
+		performances = append(performances, performance)
+	}
+	return
 }
