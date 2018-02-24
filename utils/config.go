@@ -1,4 +1,4 @@
-package main
+package utils
 
 import (
 	"fmt"
@@ -9,9 +9,9 @@ import (
 // ConfigFile is the file that stores configuration parameters for the server.
 const ConfigFile = "/etc/uschess/.config"
 
-func getDatabaseConnectionString() (databaseType string, connectionString string) {
+func GetDatabaseConnectionString() (databaseType string, connectionString string) {
 	content, err := ioutil.ReadFile(ConfigFile)
-	checkErr(err)
+	CheckErr(err)
 
 	lines := strings.Split(string(content), "\n")
 

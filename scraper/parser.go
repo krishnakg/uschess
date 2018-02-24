@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"uschess/utils"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -171,10 +172,10 @@ func parseSectionEntry(entryStr string) EventEntry {
 	*/
 	parts := strings.Split(lines[0], "|")
 	entry.position, err = strconv.Atoi(strings.TrimSpace(parts[0]))
-	checkErr(err)
+	utils.CheckErr(err)
 	entry.name = strings.Title(strings.ToLower(strings.TrimSpace(parts[1])))
 	entry.score, err = strconv.ParseFloat(strings.TrimSpace(parts[2]), 32)
-	checkErr(err)
+	utils.CheckErr(err)
 
 	// '*' in the result field represents a round robin table where the player cannot play himself.
 	re := regexp.MustCompile(` *([A-Z\*]) *([0-9]+)* *`)
@@ -186,7 +187,7 @@ func parseSectionEntry(entryStr string) EventEntry {
 		player2 := 0
 		if len(result[2]) > 0 {
 			player2, err = strconv.Atoi(result[2])
-			checkErr(err)
+			utils.CheckErr(err)
 		}
 
 		game := Game{result[1], entry.position, 0, player2, 0}
@@ -207,7 +208,7 @@ func parseSectionEntry(entryStr string) EventEntry {
 	re = regexp.MustCompile(` *([0-9]+)[ /]+([A-Z]+)*[: ]*([0-9A-Za-z]+)*[ \->]*([0-9Pp]*)`)
 	result := re.FindStringSubmatch(parts[1])
 	entry.id, err = strconv.Atoi(result[1])
-	checkErr(err)
+	utils.CheckErr(err)
 	ratingChange := RatingChange{result[2], result[3], result[4]}
 	entry.change = append(entry.change, ratingChange)
 
@@ -241,7 +242,7 @@ func parseSectionName(sectionStr string) (int, string) {
 	re := regexp.MustCompile(` *Section ([0-9]+) - (.*)`)
 	parts := re.FindStringSubmatch(sectionStr)
 	section, err := strconv.Atoi(parts[1])
-	checkErr(err)
+	utils.CheckErr(err)
 	return section, parts[2]
 }
 
@@ -252,10 +253,10 @@ func parseRating(ratingStr string) (rating int, games int) {
 		return
 	}
 	rating, err := strconv.Atoi(parts[1])
-	checkErr(err)
+	utils.CheckErr(err)
 	if parts[2] != "" {
 		games, err = strconv.Atoi(parts[2])
-		checkErr(err)
+		utils.CheckErr(err)
 	}
 	return rating, games
 }
