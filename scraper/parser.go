@@ -208,10 +208,14 @@ func parseSectionEntry(entryStr string) EventEntry {
 	entry.state = strings.TrimSpace(parts[0])
 
 	// Col 1
-	re = regexp.MustCompile(` *([0-9]+)[ /]+([A-Z]+)*[: ]*([0-9A-Za-z]+)*[ \->]*([0-9Pp]*)`)
+	re = regexp.MustCompile(` *([0-9]*)[ /]+([A-Z]+)*[: ]*([0-9A-Za-z]+)*[ \->]*([0-9Pp]*)`)
 	result := re.FindStringSubmatch(parts[1])
-	entry.id, err = strconv.Atoi(result[1])
-	utils.CheckErr(err)
+	if result[1] != "" {
+		entry.id, err = strconv.Atoi(result[1])
+		utils.CheckErr(err)
+	} else {
+		entry.id = 0
+	}
 	ratingChange := RatingChange{result[2], result[3], result[4]}
 	entry.change = append(entry.change, ratingChange)
 
