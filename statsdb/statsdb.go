@@ -2,6 +2,7 @@ package statsdb
 
 import (
 	"database/sql"
+	"fmt"
 	"uschess/utils"
 )
 
@@ -94,9 +95,26 @@ func (stats *StatsDB) GetPlayer(uscfId int) (player Player, err error) {
 	return
 }
 
+func (stats *StatsDB) GetPlayerSearchResult(query string) (players []Player, err error) {
+	query = fmt.Sprintf("%s%%", query)
+	rows, err := stats.db.Query("select id, name, state from player where name like ? limit 10", query)
+	utils.CheckErr(err)
+	defer rows.Close()
+
+	for rows.Next() {
+		var player Player
+		if err := rows.Scan(&player.ID, &player.Name, &player.State); err != nil {
+			utils.CheckErr(err)
+			return players, err
+		}
+		players = append(players, player)
+	}
+	return
+}
+
 func (stats *StatsDB) GetEvents(uscfId int) (performances []EventPerformance, err error) {
 	rows, err := stats.db.Query("select e.id, e.name, th.uscf_id, th.pre_rating, th.post_rating, th.rating_type "+
-		"from event e, tournament_history th where th.event_id=e.id and th.uscf_id=? order by e.id desc", uscfId)
+		"from event e, tournament_history th where th.event_id=e.id and th.rating_type='R' and th.uscf_id=? order by e.id desc", uscfId)
 	utils.CheckErr(err)
 	defer rows.Close()
 

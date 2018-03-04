@@ -78,3 +78,5 @@ foreign key (uscf_id)
   references player(id)
   on delete cascade
  );
+
+insert into player values(0, "", "");
