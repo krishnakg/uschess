@@ -28,20 +28,35 @@ class PlayerEvents extends Component {
     });
   }
 
-render() {
-  return (
-    <div>
-      {this.state.events.map(event =>
-        // Key is a combination of event id and and rating type which should be unique
-        <div className="row" key={event.sectionId}>
-            <div className="col-10 mb-1">{event.name}</div>
-            <div className="col-1 mb-1">{event.postRating}</div>
-            <ProgressArrow change={event.postRating-event.preRating}/>
-        </div>
-      )}
-    </div>
-  );
+  render() {
+    return (
+      <div>
+        {this.state.events.map(event =>
+          <EventRow event={event}/>
+        )}
+      </div>
+    );
+  }
 }
+
+class EventRow extends Component {
+  // The event Id is of the form YYYYMMDD. So we convert it to the form YYYY-MM-DD.
+  eventIdToDateString(eventId) {
+    return eventId.slice(0, 4) + '-' + eventId.slice(4,6) + '-' + eventId.slice(6,8);
+  }
+
+  render() {
+    var event = this.props.event;
+    return (
+      // Key is a combination of event id and and rating type which should be unique
+      <div className="row" key={event.sectionId}>
+        <div className="col-2 mb-1">{this.eventIdToDateString(event.id)}</div>
+        <div className="col-8 mb-1">{event.name}</div>
+        <div className="col-1 mb-1">{event.postRating}</div>
+        <ProgressArrow change={event.postRating-event.preRating}/>
+      </div>
+    );
+  }
 }
 
 class ProgressArrow extends Component {
