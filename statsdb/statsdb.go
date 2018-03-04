@@ -16,6 +16,11 @@ type Player struct {
 	State string `json:"state,omitempty"`
 }
 
+type Section struct {
+	ID   string `json:"id,omitempty"`
+	Name string `json:"name,omitempty"`
+}
+
 type EventPerformance struct {
 	ID         string `json:"id,omitempty"`
 	Name       string `json:"name,omitempty"`
@@ -24,6 +29,15 @@ type EventPerformance struct {
 	PreRating  int    `json:"preRating,omitempty"`
 	PostRating int    `json:"postRating,omitempty"`
 	RatingType string `json:"ratingType,omitempty"`
+}
+
+type Tournament struct {
+	ID       string `json:"id,omitempty"`
+	Name     string `json:"name,omitempty"`
+	State    string `json:"state,omitempty"`
+	City     string `json:"city,omitempty"`
+	Players  int    `json:"players,omitempty"`
+	Sections int    `json:"sections,omitempty"`
 }
 
 func (stats *StatsDB) Open() {
@@ -93,6 +107,29 @@ func (stats *StatsDB) InsertPlayer(uscfId int, name string, state string) {
 func (stats *StatsDB) GetPlayer(uscfId int) (player Player, err error) {
 	err = stats.db.QueryRow("select name, state from player where id=?", uscfId).Scan(&player.Name, &player.State)
 	player.ID = uscfId
+	return
+}
+
+func (stats *StatsDB) GetTournament(tournamentId string) (tournament Tournament, err error) {
+	err = stats.db.QueryRow("select name, state, city, players, sections from event where id=?", tournamentId).Scan(
+		&tournament.Name, &tournament.State, &tournament.City, &tournament.Players, &tournament.Sections)
+	tournament.ID = tournamentId
+	return
+}
+
+func (stats *StatsDB) GetSectionInfo(tournamentId string) (sections []Section, err error) {
+	rows, err := stats.db.Query("select id, name from section where event_id=?", tournamentId)
+	utils.CheckErr(err)
+	defer rows.Close()
+
+	for rows.Next() {
+		var section Section
+		if err := rows.Scan(&section.ID, &section.Name); err != nil {
+			utils.CheckErr(err)
+			return sections, err
+		}
+		sections = append(sections, section)
+	}
 	return
 }
 

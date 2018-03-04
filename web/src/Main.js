@@ -12,7 +12,7 @@ class Main extends Component {
         <Switch>
           <Route exact path='/' component={Home}/>
           <Route path='/players/:id' component={Player}/>
-          <Route path='/tournaments' component={Tournament}/>
+          <Route path='/tournaments/:id' component={Tournament}/>
         </Switch>
       </main>
     );
