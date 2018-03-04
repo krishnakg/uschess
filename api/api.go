@@ -21,6 +21,8 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/players/{id:[0-9]+}", getPlayerEndPoint).Methods("GET")
 	router.HandleFunc("/events", getEventsEndPoint).Methods("GET").Queries("uscf_id", "{uscf_id:[0-9]+}")
+	router.HandleFunc("/tournaments/{id}", getTournamentEndPoint).Methods("GET")
+	router.HandleFunc("/tournaments/{id}/sections", getSectionEndPoint).Methods("GET")
 	router.HandleFunc("/playersearch/{query}", getPlayerSearchEndPoint).Methods("GET")
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
@@ -39,6 +41,29 @@ func getPlayerEndPoint(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	json.NewEncoder(w).Encode(player)
+}
+
+func getTournamentEndPoint(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	tournament, err := stats.GetTournament(params["id"])
+	if err == sql.ErrNoRows {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	json.NewEncoder(w).Encode(tournament)
+}
+
+func getSectionEndPoint(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	sections, err := stats.GetSectionInfo(params["id"])
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	json.NewEncoder(w).Encode(sections)
 }
 
 func getEventsEndPoint(w http.ResponseWriter, r *http.Request) {

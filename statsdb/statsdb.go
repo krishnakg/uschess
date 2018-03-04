@@ -16,6 +16,11 @@ type Player struct {
 	State string `json:"state,omitempty"`
 }
 
+type Section struct {
+	ID   string `json:"id,omitempty"`
+	Name string `json:"name,omitempty"`
+}
+
 type EventPerformance struct {
 	ID         string `json:"id,omitempty"`
 	Name       string `json:"name,omitempty"`
@@ -24,6 +29,15 @@ type EventPerformance struct {
 	PreRating  int    `json:"preRating,omitempty"`
 	PostRating int    `json:"postRating,omitempty"`
 	RatingType string `json:"ratingType,omitempty"`
+}
+
+type Tournament struct {
+	ID       string `json:"id,omitempty"`
+	Name     string `json:"name,omitempty"`
+	State    string `json:"state,omitempty"`
+	City     string `json:"city,omitempty"`
+	Players  int    `json:"players,omitempty"`
+	Sections int    `json:"sections,omitempty"`
 }
 
 func (stats *StatsDB) Open() {
