@@ -110,6 +110,29 @@ func (stats *StatsDB) GetPlayer(uscfId int) (player Player, err error) {
 	return
 }
 
+func (stats *StatsDB) GetTournament(tournamentId string) (tournament Tournament, err error) {
+	err = stats.db.QueryRow("select name, state, city, players, sections from event where id=?", tournamentId).Scan(
+		&tournament.Name, &tournament.State, &tournament.City, &tournament.Players, &tournament.Sections)
+	tournament.ID = tournamentId
+	return
+}
+
+func (stats *StatsDB) GetSectionInfo(tournamentId string) (sections []Section, err error) {
+	rows, err := stats.db.Query("select id, name from section where event_id=?", tournamentId)
+	utils.CheckErr(err)
+	defer rows.Close()
+
+	for rows.Next() {
+		var section Section
+		if err := rows.Scan(&section.ID, &section.Name); err != nil {
+			utils.CheckErr(err)
+			return sections, err
+		}
+		sections = append(sections, section)
+	}
+	return
+}
+
 func (stats *StatsDB) GetPlayerSearchResult(query string) (players []Player, err error) {
 	query = fmt.Sprintf("%s%%", query)
 	rows, err := stats.db.Query("select id, name, state from player where name like ? limit 10", query)
