@@ -26,8 +26,8 @@ type EventPerformance struct {
 	Name       string `json:"name,omitempty"`
 	SectionID  string `json:"sectionId,omitempty"`
 	UscfID     int    `json:"uscfId,omitempty"`
-	PreRating  int    `json:"preRating,omitempty"`
-	PostRating int    `json:"postRating,omitempty"`
+	PreRating  int    `json:"preRating"`
+	PostRating int    `json:"postRating"`
 	RatingType string `json:"ratingType,omitempty"`
 }
 
@@ -38,6 +38,16 @@ type Tournament struct {
 	City     string `json:"city,omitempty"`
 	Players  int    `json:"players,omitempty"`
 	Sections int    `json:"sections,omitempty"`
+}
+
+type SectionResult struct {
+	SectionID  string  `json:"sectionId,omitempty"`
+	PlayerID   string  `json:"playerId,omitempty"`
+	PlayerName string  `json:"playerName,omitempty"`
+	RatingType string  `json:"ratingType,omitempty"`
+	PreRating  int     `json:"preRating"`
+	PostRating string  `json:"postRating"`
+	Score      float64 `json:"score"`
 }
 
 func (stats *StatsDB) Open() {
@@ -164,6 +174,24 @@ func (stats *StatsDB) GetEvents(uscfId int) (performances []EventPerformance, er
 			return performances, err
 		}
 		performances = append(performances, performance)
+	}
+	return
+}
+
+func (stats *StatsDB) GetSectionResults(sectionId string) (results []SectionResult, err error) {
+	rows, err := stats.db.Query("select th.section_id, th.uscf_id, p.name, th.rating_type, th.pre_rating, th.post_rating, th.score "+
+		"from tournament_history th, player p where p.id=th.uscf_id and th.rating_type='R' and th.section_id=?", sectionId)
+	utils.CheckErr(err)
+	defer rows.Close()
+
+	for rows.Next() {
+		var result SectionResult
+		if err := rows.Scan(&result.SectionID, &result.PlayerID, &result.PlayerName,
+			&result.RatingType, &result.PreRating, &result.PostRating, &result.Score); err != nil {
+			utils.CheckErr(err)
+			return results, err
+		}
+		results = append(results, result)
 	}
 	return
 }

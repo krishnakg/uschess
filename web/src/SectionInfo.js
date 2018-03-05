@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import Configs from './configs.js'
+import { Link } from 'react-router-dom'
+import {getAbsolutePathForSection} from './Utils.js'
 
 class SectionInfo extends Component {
   constructor(props) {
@@ -31,7 +33,7 @@ class SectionInfo extends Component {
     return (
       <div>
         {this.state.sections.map(section =>
-          <div>{section.name}</div>
+          <Link to={{ pathname: getAbsolutePathForSection(section.id) }} key={section.id}><div>{section.name}</div></Link>
         )}
       </div>
     );
