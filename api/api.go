@@ -23,6 +23,7 @@ func main() {
 	router.HandleFunc("/events", getEventsEndPoint).Methods("GET").Queries("uscf_id", "{uscf_id:[0-9]+}")
 	router.HandleFunc("/tournaments/{id}", getTournamentEndPoint).Methods("GET")
 	router.HandleFunc("/tournaments/{id}/sections", getSectionEndPoint).Methods("GET")
+	router.HandleFunc("/sections/{id}", getSectionCrossTableEndPoint).Methods("GET")
 	router.HandleFunc("/playersearch/{query}", getPlayerSearchEndPoint).Methods("GET")
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
@@ -91,4 +92,16 @@ func getPlayerSearchEndPoint(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	json.NewEncoder(w).Encode(players)
+}
+
+func getSectionCrossTableEndPoint(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+
+	results, err := stats.GetSectionResults(params["id"])
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	json.NewEncoder(w).Encode(results)
 }

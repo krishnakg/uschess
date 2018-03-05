@@ -10,9 +10,11 @@ class Main extends Component {
     return (
       <main>
         <Switch>
+          {/* REVIEW: All url paths to make sure we are consistent. */}
           <Route exact path='/' component={Home}/>
           <Route path='/players/:id' component={Player}/>
-          <Route path='/tournaments/:id' component={Tournament}/>
+          <Route path='/tournaments/:id/:section' component={Tournament}/>
+          {/* TODO: May be also support directly going to the tournament page without the section information. */}
         </Switch>
       </main>
     );

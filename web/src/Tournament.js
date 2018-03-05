@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import TournamentInfo from './TournamentInfo'
 import SectionInfo from './SectionInfo';
+import SectionResult from './SectionResult';
 
 class Tournament extends Component {
   render() {
@@ -14,8 +15,9 @@ class Tournament extends Component {
             <SectionInfo tournamentId={this.props.match.params.id}/>
           </div>
           <div className="col-9 border rounded">
-            <h4 className="mb-4">Games</h4>
-            <div></div>
+            {/* TODO: Make this a margin or padding instead. */}
+            <h4>&nbsp;</h4> 
+            <SectionResult sectionId={this.props.match.params.id + "." + this.props.match.params.section}/>
           </div>         
         </div>
       </div>

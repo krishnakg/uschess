@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import Configs from './configs.js'
 import { Link } from 'react-router-dom'
+import {getAbsolutePathForSection} from './Utils.js'
 
 class PlayerEvents extends Component {
   constructor(props) {
@@ -32,8 +33,10 @@ class PlayerEvents extends Component {
   render() {
     return (
       <div>
-        {this.state.events.map(event =>
-          <EventRow event={event}/>
+        {this.state.events.map((event, index) =>
+          // REVIEW: Look for better way to organize keys for various components.
+          // TODO: Using index as a key for now as there are cases where all values are same for both rows.
+          <EventRow key={event.sectionId + index} event={event}/>
         )}
       </div>
     );
@@ -53,7 +56,7 @@ class EventRow extends Component {
       <div className="row" key={event.sectionId}>
         <div className="col-2 mb-1">{this.eventIdToDateString(event.id)}</div>
         <div className="col-8 mb-1">
-          <Link to={{ pathname: '/tournaments/'+event.id }}>{event.name}</Link>
+          <Link to={{ pathname: getAbsolutePathForSection(event.sectionId) }}>{event.name}</Link>
         </div>
         <div className="col-1 mb-1">{event.postRating}</div>
         <ProgressArrow change={event.postRating-event.preRating}/>
