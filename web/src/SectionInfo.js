@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import Configs from './configs.js'
-import { Link } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
+
 import {getAbsolutePathForSection} from './Utils.js'
 
 class SectionInfo extends Component {
@@ -31,9 +32,11 @@ class SectionInfo extends Component {
 
   render() {
     return (
-      <div>
+      <div className="nav flex-column nav-pills">
         {this.state.sections.map(section =>
-          <Link to={{ pathname: getAbsolutePathForSection(section.id) }} key={section.id}><div>{section.name}</div></Link>
+          <div key={section.id}>
+            <NavLink className="nav-item nav-link" activeClassName='active' to={{ pathname: getAbsolutePathForSection(section.id) }}>{section.name}</NavLink>
+          </div>
         )}
       </div>
     );
