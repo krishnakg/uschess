@@ -140,6 +140,7 @@ func convertGamesToSectionPairings(games []statsdb.Game) (sectionPairings Sectio
 		// This should not be set every time in this loop.
 		sectionPairings.SectionID = game.SectionID
 
+		// We will create the map entries the first time we see the keys.
 		if _, ok := sectionPairings.PlayerResults[game.Player1ID]; !ok {
 			sectionPairings.PlayerResults[game.Player1ID] = make(map[int]RoundResult)
 		}
@@ -153,6 +154,8 @@ func convertGamesToSectionPairings(games []statsdb.Game) (sectionPairings Sectio
 	return sectionPairings
 }
 
+// Convert game information into two results for each player. This will let UI clients
+// to easily showcase performance against opponents easily.
 func gameToRoundResults(game statsdb.Game) (roundResults [2]RoundResult) {
 	var player2Result string
 	switch game.Result {
@@ -163,7 +166,9 @@ func gameToRoundResults(game statsdb.Game) (roundResults [2]RoundResult) {
 	case "D":
 		player2Result = "D"
 	}
+	// roundResults[0] will contain information on Player2's result against Player1.
 	roundResults[0] = RoundResult{game.Player1ID, game.Player1Name, game.Player1Color, player2Result}
+	// roundResults[1] will contain information on Player1's result against Player2.
 	roundResults[1] = RoundResult{game.Player2ID, game.Player2Name, game.Player2Color, game.Result}
 	return roundResults
 }

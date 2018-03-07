@@ -49,19 +49,18 @@ class SectionResult extends Component {
       return [];
     }
     // Convert data on each player from map to an array.
-    var array = Object.keys(games[playerId]).map(function (key) { return games[playerId][key]; });
+    var array = Object.keys(games[playerId]).map( key => games[playerId][key]);
     if (array == null || array.length === 0) {
       return [];
     }
 
     // Convert data on all rounds, which is a map into an array for react to render it.
-    return Object.keys(array).map(function (key) { return array[key]; });
+    return Object.keys(array).map(key => array[key]);
   }
   render() {
     return (
       <div>
         {this.state.results.map((result, index) =>
-
         // TODO: Using index as a key for now as there are cases where all values are same for both rows.
           <SectionResultRow result={result} games={this.getGames(result.playerId)} position={index + 1} key={result.playerId + result.score + index}/>          
         )}
@@ -93,6 +92,7 @@ class SectionPairings extends Component {
       <div className="col-12 collapse" id={"collapse"+this.props.playerId}>
       <div className="card card-body">
       {this.props.games.map((game, index) =>
+        // TODO: Using index as a key is a bad idea. Need to fix this.
         <div className="row" key={"pairings" + this.props.playerId + game.playerId + index}>
           <div className="col-2 mb-1"></div>
           <div className="col-1 mb-1">{index+1}</div>
