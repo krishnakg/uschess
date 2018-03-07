@@ -4,7 +4,8 @@ const Configs = {
   playerEventsUrl : apiServerUrl + "events?uscf_id=",
   playerSearchUrl : apiServerUrl + "playersearch/",
   tournamentInfoUrl : apiServerUrl + "tournaments/",
-  sectionResultUrl : apiServerUrl + "sections/"
+  sectionResultUrl : apiServerUrl + "sections/",
+  sectionGamesUrl : apiServerUrl + "games/"
 };
 
 export default Configs;

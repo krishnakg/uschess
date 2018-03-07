@@ -50,6 +50,19 @@ type SectionResult struct {
 	Score      float64 `json:"score"`
 }
 
+type Game struct {
+	GameID       int    `json:"gameId,omitempty"`
+	SectionID    string `json:"sectionid,omitempty"`
+	Round        int    `json:"round,omitempty"`
+	Result       string `json:"result,omitempty"`
+	Player1ID    int    `json:"player1Id,omitempty"`
+	Player1Name  string `json:"player1Name,omitempty"`
+	Player1Color uint8  `json:"player1Color,omitempty"`
+	Player2ID    int    `json:"player2Id,omitempty"`
+	Player2Name  string `json:"player2Name,omitempty"`
+	Player2Color uint8  `json:"player2Color,omitempty"`
+}
+
 func (stats *StatsDB) Open() {
 	var err error
 	dbType, dbConnectionString := utils.GetDatabaseConnectionString()
@@ -192,6 +205,28 @@ func (stats *StatsDB) GetSectionResults(sectionId string) (results []SectionResu
 			return results, err
 		}
 		results = append(results, result)
+	}
+	return
+}
+
+func (stats *StatsDB) GetGames(sectionId string) (games []Game, err error) {
+	rows, err := stats.db.Query("select g.id, g.section_id, g.round, g.result, "+
+		"g.player1, p1.name, g.player1_color, g.player2, p2.name, g.player2_color "+
+		"from player p1, game g, player p2 "+
+		"where g.section_id=? and  p1.id=g.player1 and  p2.id=g.player2 and g.event_id in "+
+		"(select event_id from tournament_history where rating_type='R');", sectionId)
+	utils.CheckErr(err)
+	defer rows.Close()
+
+	for rows.Next() {
+		var game Game
+		if err := rows.Scan(&game.GameID, &game.SectionID, &game.Round, &game.Result,
+			&game.Player1ID, &game.Player1Name, &game.Player1Color,
+			&game.Player2ID, &game.Player2Name, &game.Player2Color); err != nil {
+			utils.CheckErr(err)
+			return games, err
+		}
+		games = append(games, game)
 	}
 	return
 }
