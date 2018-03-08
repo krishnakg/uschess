@@ -1,8 +1,13 @@
 
 export const getAbsolutePathForSection = function(sectionId) {
-  return '/tournaments/' + sectionId.replace(".", "/")
+  return '/tournaments/' + sectionId.replace(".", "/");
+}
+
+export const getAbsolutePathForPlayer = function(playerId) {
+  return '/players/' + playerId;
 }
 
 export default {
-  getAbsolutePathForSection : getAbsolutePathForSection
+  getAbsolutePathForSection : getAbsolutePathForSection,
+  getAbsolutePathForPlayer : getAbsolutePathForPlayer
 }

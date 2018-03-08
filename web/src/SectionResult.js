@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom'
 import Configs from './configs.js'
+import {getAbsolutePathForPlayer} from './Utils.js'
+import ProgressArrow from './ProgressArrow.js';
 
 class SectionResult extends Component {
   constructor(props) {
@@ -75,12 +77,13 @@ function SectionResultRow(props) {
       <div className="row">
         <div className="col-1 mb-1">{props.position}</div>
         <div className="col-7 mb-1">
-        <Link to={{ pathname: "/players/" + props.result.playerId }}>{props.result.playerName}</Link>
+        <Link to={{ pathname: getAbsolutePathForPlayer(props.result.playerId) }}>{props.result.playerName}</Link>
         </div>
         <div className="col-2 mb-1">
           <a href={"#collapse"+ props.result.playerId} role="button" data-toggle="collapse">{props.result.score}</a>
         </div>
-        <div className="col-2 mb-1">{props.result.postRating}</div>
+        <div className="col-1 mb-1">{props.result.postRating}</div>
+        <ProgressArrow change={props.result.postRating - props.result.preRating}/>
         <SectionPairings playerId={props.result.playerId} games={props.games}/>          
       </div>
     );
