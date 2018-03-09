@@ -51,8 +51,7 @@ class Player extends Component {
               <h4 className="mb-4">Recent Events</h4>
               <PlayerEvents playerId={this.props.match.params.id} events={this.state.events}/> 
             </div>
-            <div className="col-4">
-              <h4 className="mb-4"></h4>
+            <div className="col-4">              
               <div></div>
             </div>         
           </div>
@@ -65,14 +64,9 @@ class Player extends Component {
 
 class RatingPlot extends Component {
   getDataFromEvents(events) {
-    let data = [];
-    events.slice(0).reverse().map((tournament, index) => {
-      data.push({
-        x: index,
-        y: tournament.postRating
-      })
+    return events.slice(0).reverse().map((tournament, index) => {
+      return {x:index, y:tournament.postRating};
     });
-    return data;
   }
 
   render() {
