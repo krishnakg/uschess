@@ -29,7 +29,7 @@ class PlayerInfo extends Component {
 render() {
   return (
     <div className="row" key={this.state.player.id}>
-        <h5 className="col-12">{this.state.player.name}</h5>
+        <h3 className="col-12">{this.state.player.name}</h3>
         <h6 className="col-3">USCF Id</h6><h6 className="col-9">{this.state.player.id}</h6>
         <h6 className="col-3">State</h6><h6 className="col-9">{this.state.player.state}</h6>
     </div>

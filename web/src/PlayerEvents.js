@@ -1,40 +1,13 @@
 import React, { Component } from 'react';
-import axios from 'axios';
-import Configs from './configs.js'
 import ProgressArrow from './ProgressArrow.js'
 import { Link } from 'react-router-dom'
 import {getAbsolutePathForSection} from './Utils.js'
 
 class PlayerEvents extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      events: []
-    }
-  }
-
-  componentDidMount() {
-    this.fetchPlayerEvents(this.props.playerId)
-  } 
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.playerId !== this.props.playerId) {
-      this.fetchPlayerEvents(nextProps.playerId)
-    }
-  }
-
-  fetchPlayerEvents(playerId) {
-    axios.get(Configs.playerEventsUrl + playerId)
-    .then(res => {
-      const events = res.data;
-      this.setState({ events });
-    });
-  }
-
   render() {
     return (
       <div>
-        {this.state.events.map((event, index) =>
+        {this.props.events.map((event, index) =>
           // REVIEW: Look for better way to organize keys for various components.
           // TODO: Using index as a key for now as there are cases where all values are same for both rows.
           <EventRow key={event.sectionId + index} event={event}/>
