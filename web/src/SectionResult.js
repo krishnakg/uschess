@@ -42,34 +42,31 @@ class SectionResult extends Component {
     });
   }
 
-  getGames(playerId) {
-    if (this.state.games.length===0) {
-      return [];
-    }
-    var games =  this.state.games;
-    if (games[playerId] == null || games[playerId].length === 0) {
+  getGames(playerId) {    
+    var games =  this.state.games || [];
+    if (games[playerId] == null) {
       return [];
     }
     // Convert data on each player from map to an array.
-    var array = Object.keys(games[playerId]).map( key => games[playerId][key]);
-    if (array == null || array.length === 0) {
-      return [];
-    }
-
+    var array = Object.keys(games[playerId]).map( key => games[playerId][key]) || [];
+    
     // Convert data on all rounds, which is a map into an array for react to render it.
     return Object.keys(array).map(key => array[key]);
   }
+
   render() {
+    // Make sure there is data before rendering.
+    const results = this.state.results || [];
     return (
       <div>
-        {this.state.results.map((result, index) =>
+        {results.map((result, index) =>
         // TODO: Using index as a key for now as there are cases where all values are same for both rows.
           <SectionResultRow result={result} games={this.getGames(result.playerId)} position={index + 1} key={result.playerId + result.score + index}/>          
         )}
       </div>
 
     );
-  }
+  } 
 }
 
 function SectionResultRow(props) {
