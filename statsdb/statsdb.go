@@ -140,6 +140,24 @@ func (stats *StatsDB) GetTournament(tournamentId string) (tournament Tournament,
 	return
 }
 
+func (stats *StatsDB) GetTournaments(numTournaments int) (tournaments []Tournament, err error) {
+	rows, err := stats.db.Query("select distinct e.id, e.name, e.city, e.state, e.players from event e, tournament_history th "+
+		"where th.event_id=e.id and th.rating_type='R' order by e.id desc limit ?", numTournaments)
+	utils.CheckErr(err)
+	defer rows.Close()
+
+	for rows.Next() {
+		var tournament Tournament
+		if err := rows.Scan(&tournament.ID, &tournament.Name, &tournament.City, &tournament.State,
+			&tournament.Players); err != nil {
+			utils.CheckErr(err)
+			return tournaments, err
+		}
+		tournaments = append(tournaments, tournament)
+	}
+	return
+}
+
 func (stats *StatsDB) GetSectionInfo(tournamentId string) (sections []Section, err error) {
 	rows, err := stats.db.Query("select id, name from section where event_id=?", tournamentId)
 	utils.CheckErr(err)
