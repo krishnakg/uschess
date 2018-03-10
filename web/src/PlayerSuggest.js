@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
-import Autosuggest from 'react-autosuggest';
-import './PlayerSuggest.css';
-import Configs from './configs.js'
-import axios from 'axios';
 import { Link } from 'react-router-dom'
+import Autosuggest from 'react-autosuggest';
+import axios from 'axios';
+
+import Configs from './configs.js'
+
+import './PlayerSuggest.css';
 
 // When suggestion is clicked, Autosuggest needs to populate the input
 // based on the clicked suggestion. Teach Autosuggest how to calculate the

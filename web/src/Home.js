@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import TournamentList from './TournamentList'
 import axios from 'axios';
+
+import TournamentList from './TournamentList'
 import Configs from './configs.js'
 
 class Home extends Component {

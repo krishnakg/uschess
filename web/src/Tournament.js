@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
-import TournamentInfo from './TournamentInfo'
+
 import SectionInfo from './SectionInfo';
 import SectionResult from './SectionResult';
+import TournamentInfo from './TournamentInfo'
+
+import './Tournament.css';
 
 class Tournament extends Component {
   render() {
@@ -10,14 +13,12 @@ class Tournament extends Component {
     return (
       <div className="container">
         <TournamentInfo tournamentId={tournamentId}/>
-        <div className="row">
-          <div className="col-3 border rounded">
+        <div className="row top-buffer">
+          <div className="col-3">
             <h4 className="mb-4">Sections</h4>
             <SectionInfo tournamentId={tournamentId}/>
           </div>
-          <div className="col-9 border rounded">
-            {/* TODO: Make this a margin or padding instead. */}
-            <h4>&nbsp;</h4> 
+          <div className="col-9">
             <SectionResult sectionId={sectionId}/>
           </div>         
         </div>

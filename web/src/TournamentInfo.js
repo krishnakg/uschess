@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+
 import Configs from './configs.js'
 
 class TournamentInfo extends Component {
@@ -30,7 +31,7 @@ class TournamentInfo extends Component {
   render() {
     return (
         <div className="row">
-          <div className="col-12 border rounded">
+          <div className="col-12">
             <h4>{this.state.tournament.name}</h4>
             <h5>{this.state.tournament.city}, {this.state.tournament.state}</h5>
             <h6>{this.state.tournament.sections} sections, {this.state.tournament.players} players</h6>

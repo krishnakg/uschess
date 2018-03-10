@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom'
+
 import {getAbsolutePathForTournament, tournamentIdToDateString} from './Utils.js'
 
 class TournamentList extends Component {
