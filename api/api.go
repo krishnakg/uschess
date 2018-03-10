@@ -34,6 +34,7 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/players/{id:[0-9]+}", getPlayerEndPoint).Methods("GET")
 	router.HandleFunc("/events", getEventsEndPoint).Methods("GET").Queries("uscf_id", "{uscf_id:[0-9]+}")
+	router.HandleFunc("/tournaments/", getTournamentListEndPoint).Methods("GET")
 	router.HandleFunc("/tournaments/{id}", getTournamentEndPoint).Methods("GET")
 	router.HandleFunc("/tournaments/{id}/sections", getSectionEndPoint).Methods("GET")
 	router.HandleFunc("/sections/{id}", getSectionCrossTableEndPoint).Methods("GET")
@@ -94,6 +95,16 @@ func getEventsEndPoint(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	json.NewEncoder(w).Encode(performances)
+}
+
+func getTournamentListEndPoint(w http.ResponseWriter, r *http.Request) {
+	tournaments, err := stats.GetTournaments(20)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	json.NewEncoder(w).Encode(tournaments)
 }
 
 func getPlayerSearchEndPoint(w http.ResponseWriter, r *http.Request) {

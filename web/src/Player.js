@@ -34,29 +34,27 @@ class Player extends Component {
 
   render() {
     return (
-        <div>
-        <div className="container">
+      <div className="container">
 
-          <div className="row">
-            <div className="col-6">
-              <PlayerInfo playerId={this.props.match.params.id}/> 
-            </div>
-            <div className="col-6">
-              <RatingPlot events={this.state.events}/> 
-            </div>
+        <div className="row">
+          <div className="col-6">
+            <PlayerInfo playerId={this.props.match.params.id}/> 
           </div>
-
-          <div className="row">
-            <div className="col-8">
-              <h4 className="mb-4">Recent Events</h4>
-              <PlayerEvents playerId={this.props.match.params.id} events={this.state.events}/> 
-            </div>
-            <div className="col-4">              
-              <div></div>
-            </div>         
+          <div className="col-6">
+            <RatingPlot events={this.state.events}/> 
           </div>
-        
         </div>
+
+        <div className="row">
+          <div className="col-8">
+            <h4 className="mb-4">Recent Events</h4>
+            <PlayerEvents playerId={this.props.match.params.id} events={this.state.events}/> 
+          </div>
+          <div className="col-4">              
+            <div></div>
+          </div>         
+        </div>
+      
       </div>
     );
   }

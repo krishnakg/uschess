@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import ProgressArrow from './ProgressArrow.js'
 import { Link } from 'react-router-dom'
-import {getAbsolutePathForSection} from './Utils.js'
+import {getAbsolutePathForSection, tournamentIdToDateString} from './Utils.js'
 
 class PlayerEvents extends Component {
   render() {
@@ -18,17 +18,13 @@ class PlayerEvents extends Component {
 }
 
 class EventRow extends Component {
-  // The event Id is of the form YYYYMMDD. So we convert it to the form YYYY-MM-DD.
-  eventIdToDateString(eventId) {
-    return eventId.slice(0, 4) + '-' + eventId.slice(4,6) + '-' + eventId.slice(6,8);
-  }
 
   render() {
     var event = this.props.event;
     return (
       // Key is a combination of event id and and rating type which should be unique
       <div className="row" key={event.sectionId}>
-        <div className="col-2 mb-1">{this.eventIdToDateString(event.id)}</div>
+        <div className="col-2 mb-1">{tournamentIdToDateString(event.id)}</div>
         <div className="col-8 mb-1">
           <Link to={{ pathname: getAbsolutePathForSection(event.sectionId) }}>{event.name}</Link>
         </div>
