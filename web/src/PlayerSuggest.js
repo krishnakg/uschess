@@ -16,7 +16,7 @@ const getSuggestionValue = suggestion => suggestion.name;
 const renderSuggestion = suggestion => (
   // Refactor this into a simple component.
   <span>
-    <Link to={{ pathname: '/players/'+suggestion.id }} style={{ textDecoration: 'none' }}>
+    <Link to={{ pathname: Configs.playerInfoUrl + suggestion.id }} style={{ textDecoration: 'none' }}>
       <span style={{display:"block"}}>{suggestion.name}
         <span style={{float:"right"}}> {suggestion.state}</span>
       </span>
