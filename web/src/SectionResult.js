@@ -64,7 +64,6 @@ class SectionResult extends Component {
           <SectionResultRow result={result} games={this.getGames(result.playerId)} position={index + 1} key={result.playerId + result.score + index}/>          
         )}
       </div>
-
     );
   } 
 }
