@@ -4,7 +4,7 @@ import Autosuggest from 'react-autosuggest';
 import axios from 'axios';
 
 import Configs from './configs.js'
-
+import {getAbsolutePathForPlayer} from './Utils.js'
 import './PlayerSuggest.css';
 
 // When suggestion is clicked, Autosuggest needs to populate the input
@@ -16,7 +16,7 @@ const getSuggestionValue = suggestion => suggestion.name;
 const renderSuggestion = suggestion => (
   // Refactor this into a simple component.
   <span>
-    <Link to={{ pathname: Configs.playerInfoUrl + suggestion.id }} style={{ textDecoration: 'none' }}>
+    <Link to={{ pathname: getAbsolutePathForPlayer(suggestion.id) }} style={{ textDecoration: 'none' }}>
       <span style={{display:"block"}}>{suggestion.name}
         <span style={{float:"right"}}> {suggestion.state}</span>
       </span>

@@ -55,6 +55,7 @@ func getPlayerEndPoint(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	json.NewEncoder(w).Encode(player)
 }
 
@@ -65,6 +66,7 @@ func getTournamentEndPoint(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	json.NewEncoder(w).Encode(tournament)
 }
 
@@ -75,7 +77,7 @@ func getSectionEndPoint(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	json.NewEncoder(w).Encode(sections)
 }
 
@@ -90,6 +92,7 @@ func getEventsEndPoint(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	json.NewEncoder(w).Encode(performances)
 }
 
@@ -99,6 +102,7 @@ func getTournamentListEndPoint(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	json.NewEncoder(w).Encode(tournaments)
 }
 
@@ -109,7 +113,7 @@ func getPlayerSearchEndPoint(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	json.NewEncoder(w).Encode(players)
 }
 
@@ -121,6 +125,7 @@ func getSectionCrossTableEndPoint(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	json.NewEncoder(w).Encode(results)
 }
 
@@ -133,6 +138,7 @@ func getGamesInSectionEndPoint(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	sectionPairings := convertGamesToSectionPairings(games)
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	json.NewEncoder(w).Encode(sectionPairings.PlayerResults)
 }
 
