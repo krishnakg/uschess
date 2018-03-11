@@ -1,4 +1,8 @@
-const apiUrl = 'http://localhost:8080'
+var apiUrl = 'http://54.245.37.181:8080'
+if (process.env.NODE_ENV != 'production') {
+  apiUrl = 'http://localhost:8080'
+}
+
 const Configs = {
   playerInfoUrl : apiUrl + "/players/",
   playerEventsUrl : apiUrl + "/events?uscf_id=",
