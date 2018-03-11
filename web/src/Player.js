@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
+import {XYPlot, XAxis, YAxis, HorizontalGridLines, LineSeries} from 'react-vis';
+import axios from 'axios';
+
+import Configs from './configs.js'
 import PlayerInfo from './PlayerInfo'
 import PlayerEvents from './PlayerEvents'
-import axios from 'axios';
-import Configs from './configs.js'
-import {XYPlot, XAxis, YAxis, HorizontalGridLines, LineSeries} from 'react-vis';
+
 import '../node_modules/react-vis/dist/style.css'; 
 
 class Player extends Component {

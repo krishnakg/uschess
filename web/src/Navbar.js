@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+
 import PlayerSuggest from './PlayerSuggest';
 
 class Navbar extends Component {

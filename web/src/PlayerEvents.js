@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import ProgressArrow from './ProgressArrow.js'
 import { Link } from 'react-router-dom'
+
+import ProgressArrow from './ProgressArrow.js'
 import {getAbsolutePathForSection, tournamentIdToDateString} from './Utils.js'
 
 class PlayerEvents extends Component {
