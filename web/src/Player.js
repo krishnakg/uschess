@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {XYPlot, XAxis, YAxis, HorizontalGridLines, LineSeries} from 'react-vis';
+import {XYPlot, XAxis, YAxis, HorizontalGridLines, LineSeries, Hint} from 'react-vis';
 import axios from 'axios';
 
 import Configs from './configs.js'
@@ -70,16 +70,32 @@ class RatingPlot extends Component {
   }
 
   render() {
+    var data = this.getDataFromEvents(this.props.events);
+    const {yMin, yMax} = data.reduce((acc, row) => ({
+        yMax: Math.max(acc.yMax, row.y),
+        yMin: Math.min(acc.yMin, row.y)
+        }), {yMin: Infinity, yMax: -Infinity})  
+
+    var yTickValues = [];
+    for (var i  = yMin; i <= yMax; i += 50) {
+      yTickValues.push(i);
+    }
+
+    var xTickValues = [];    
+    for (i  = 0; i <= data.length; i += 5) {
+      xTickValues.push(i);
+    }
+
     return (
-    <XYPlot width={400} height={300}>
-    <HorizontalGridLines />
-    <LineSeries
-      data={this.getDataFromEvents(this.props.events)}
-      curve={'curveMonotoneX'}
-    />
-    <XAxis />
-    <YAxis tickPadding={1}/>
-    </XYPlot>
+      <XYPlot width={400} height={300}>
+      <HorizontalGridLines />
+      <LineSeries
+        data={data}
+        curve={'curveMonotoneX'}
+      />
+      <XAxis title="Tournaments" tickValues={xTickValues}/>
+      <YAxis title="Rating" tickPadding={1} tickValues={yTickValues}/>
+      </XYPlot>
     )
   }
 }
