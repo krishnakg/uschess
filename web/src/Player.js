@@ -64,22 +64,44 @@ class Player extends Component {
 
 class RatingPlot extends Component {
   getDataFromEvents(events) {
+    // TODO: It might be interesting to use the prerating for the first available tournament 
+    // as the starting point so that the graph looks reasonable for players with 1 tournament.
     return events.slice(0).reverse().map((tournament, index) => {
       return {x:index, y:tournament.postRating};
     });
   }
 
   render() {
+    
+    var data = this.getDataFromEvents(this.props.events);
+    const {yMin, yMax} = data.reduce((acc, row) => ({
+        yMax: Math.max(acc.yMax, row.y),
+        yMin: Math.min(acc.yMin, row.y)
+        }), {yMin: Infinity, yMax: -Infinity})  
+
+    // Y-axis is rating. By specifying a reasonable rating tick values, we are avoiding 
+    // the crazy/empty tickValues that react-vis produces.
+    var yTickValues = [];
+    for (var i  = yMin; i <= yMax; i += 50) {
+      yTickValues.push(i);
+    }
+
+    // X-axis is number of tournaments.
+    var xTickValues = [];    
+    for (i  = 0; i <= data.length; i += 5) {
+      xTickValues.push(i);
+    }
+
     return (
-    <XYPlot width={400} height={300}>
-    <HorizontalGridLines />
-    <LineSeries
-      data={this.getDataFromEvents(this.props.events)}
-      curve={'curveMonotoneX'}
-    />
-    <XAxis />
-    <YAxis tickPadding={1}/>
-    </XYPlot>
+      <XYPlot width={400} height={300}>
+      <HorizontalGridLines />
+      <LineSeries
+        data={data}
+        curve={'curveMonotoneX'}
+      />
+      <XAxis title="Tournaments" tickValues={xTickValues}/>
+      <YAxis title="Rating" tickPadding={1} tickValues={yTickValues}/>
+      </XYPlot>
     )
   }
 }

@@ -1,5 +1,5 @@
 var apiUrl = 'http://54.245.37.181:8080'
-if (process.env.NODE_ENV != 'production') {
+if (process.env.NODE_ENV !== 'production') {
   apiUrl = 'http://localhost:8080'
 }
 
