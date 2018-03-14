@@ -95,7 +95,7 @@ class SectionPairings extends Component {
         <div className="row" key={"pairings" + this.props.playerId + game.playerId + index}>
           <div className="col-2 mb-1"></div>
           <div className="col-1 mb-1">{index+1}</div>
-          <div className="col-7 mb-1">{game.playerName}</div>
+          <div className="col-5 mb-1">{game.playerName}</div>
           <div className="col-2 mb-1">{game.result}</div>
         </div>
       )}
