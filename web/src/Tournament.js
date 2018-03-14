@@ -13,12 +13,13 @@ class Tournament extends Component {
     return (
       <div className="container">
         <TournamentInfo tournamentId={tournamentId}/>
-        <div className="row top-buffer">
-          <div className="col-3">
+        <div className="row">
+          <div className="col-xs-6 col-md-3 top-buffer">
             <h4 className="mb-4">Sections</h4>
             <SectionInfo tournamentId={tournamentId}/>
           </div>
-          <div className="col-9">
+          <div className="col-xs-12 col-md-9 top-buffer">
+            <h4 className="mb-4">Results</h4>
             <SectionResult sectionId={sectionId}/>
           </div>         
         </div>
