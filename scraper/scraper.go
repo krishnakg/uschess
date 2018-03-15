@@ -3,10 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"time"
 	"uschess/statsdb"
 	"uschess/utils"
+
+	"github.com/golang/glog"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -21,21 +22,23 @@ func main() {
 	savePtr := flag.Bool("save", false, "Saves data to database. By default save is false and only does the data fetch.")
 
 	flag.Parse()
+	// Make sure all logs gets flushed before close.
+	defer glog.Flush()
 
 	t, err := time.Parse("2006-01-02", *startDatePtr)
 	if err != nil {
-		log.Fatalf("Invalid format for startdate specified. %s", err.Error())
+		glog.Fatalf("Invalid format for startdate specified. %s", err.Error())
 	}
 	utils.CheckErr(err)
 
 	t = t.AddDate(0, 0, *offsetPtr)
-	log.Printf("Starting date for processing: %s", t.String())
+	glog.Infof("Starting date for processing: %s", t.String())
 
 	// Initialize database connection.
 	var stats statsdb.StatsDB
 	stats.Open()
 	defer stats.Close()
-	log.Printf("Initialized database.")
+	glog.Info("Initialized database.")
 
 	if *monthPtr {
 		processMonth(stats, t, *forcePtr, *savePtr)
@@ -73,24 +76,24 @@ func processMonth(stats statsdb.StatsDB, t time.Time, force bool, save bool) {
 // writing anything to the database.
 func processDate(stats statsdb.StatsDB, t time.Time, force bool, save bool) {
 	date := fmt.Sprintf("%4d-%02d-%02d", t.Year(), t.Month(), t.Day())
-	log.Printf("Fetching all events for %s", date)
+	glog.Infof("Fetching all events for %s", date)
 	events := fetchEvents(date)
 
 	if force {
 		if save {
-			log.Printf("Deleting all events for date: %s", date)
+			glog.Infof("Deleting all events for date: %s", date)
 			stats.DeleteEvents(date)
 		} else {
-			log.Printf("Dryrun deleting all events at date %s", date)
+			glog.Infof("Dryrun deleting all events at date %s", date)
 		}
 	}
 
 	for _, event := range events {
 		if save {
-			log.Printf("Saving event %s:%s", event.id, event.name)
+			glog.Infof("Saving event %s:%s", event.id, event.name)
 			saveEvent(stats, event)
 		} else {
-			log.Printf("Dryrun saving event %s:%s", event.id, event.name)
+			glog.Infof("Dryrun saving event %s:%s", event.id, event.name)
 		}
 	}
 }
