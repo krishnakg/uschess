@@ -3,6 +3,7 @@ package statsdb
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 	"uschess/utils"
 )
 
@@ -247,4 +248,16 @@ func (stats *StatsDB) GetGames(sectionId string) (games []Game, err error) {
 		games = append(games, game)
 	}
 	return
+}
+
+// DeleteEvents deletes all events in the database for the particular date. The date format should
+// be YYYY-MM-DD.
+func (stats *StatsDB) DeleteEvents(date string) {
+	query := fmt.Sprintf("%s%%", strings.Replace(date, "-", "", -1))
+	deleteStatement, err := stats.db.Prepare("delete from event where id like ?")
+	utils.CheckErr(err)
+	defer deleteStatement.Close()
+
+	_, err = deleteStatement.Exec(query)
+	utils.CheckErr(err)
 }
