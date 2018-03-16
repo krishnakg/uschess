@@ -1,11 +1,9 @@
 package utils
 
-import (
-	"log"
-)
+import "github.com/golang/glog"
 
 func CheckErr(err error) {
 	if err != nil {
-		log.Fatal(err)
+		glog.Fatal(err)
 	}
 }

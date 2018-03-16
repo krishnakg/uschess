@@ -3,10 +3,12 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
-	"log"
+	"flag"
 	"net/http"
 	"strconv"
 	"uschess/statsdb"
+
+	"github.com/golang/glog"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
@@ -14,20 +16,13 @@ import (
 
 var stats statsdb.StatsDB
 
-type RoundResult struct {
-	PlayerId    int    `json:"playerId"`
-	PlayerName  string `json:"playerName"`
-	PlayerColor uint8  `json:"playerColor"`
-	Result      string `json:"result,omitempty"`
-}
-
-type SectionPairings struct {
-	SectionID string `json:"sectionId,omitempty"`
-	// Map of PlayerId -> {Round -> RoundResult}.
-	PlayerResults map[int]map[int]RoundResult `json:"player,omitempty"`
-}
-
 func main() {
+	portPtr := flag.String("port", "8080", "Port at which api server will listen to.")
+
+	flag.Parse()
+	defer glog.Flush()
+
+	// Initialize database connection.
 	stats.Open()
 	defer stats.Close()
 
@@ -40,14 +35,18 @@ func main() {
 	router.HandleFunc("/sections/{id}", getSectionCrossTableEndPoint).Methods("GET")
 	router.HandleFunc("/games/{id}", getGamesInSectionEndPoint).Methods("GET")
 	router.HandleFunc("/playersearch/{query}", getPlayerSearchEndPoint).Methods("GET")
-	log.Fatal(http.ListenAndServe(":8080", router))
+
+	glog.Info("Server starting..")
+	glog.Fatal(http.ListenAndServe(":"+*portPtr, router))
+	glog.Info("Shutting down..")
 }
 
 func getPlayerEndPoint(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	uscfID, err := strconv.Atoi(params["id"])
 	if err != nil {
-		panic(err)
+		w.WriteHeader(http.StatusNotFound)
+		return
 	}
 
 	player, err := stats.GetPlayer(uscfID)
@@ -131,53 +130,16 @@ func getSectionCrossTableEndPoint(w http.ResponseWriter, r *http.Request) {
 
 func getGamesInSectionEndPoint(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-
-	games, err := stats.GetGames(params["id"])
+	sectionID := params["id"]
+	games, err := stats.GetGames(sectionID)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	sectionPairings := convertGamesToSectionPairings(games)
+
+	sectionPairings := NewSectionPairings(sectionID)
+	sectionPairings.addGames(games)
+
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	json.NewEncoder(w).Encode(sectionPairings.PlayerResults)
-}
-
-func convertGamesToSectionPairings(games []statsdb.Game) (sectionPairings SectionPairings) {
-	// map of player id to their results.
-	sectionPairings.PlayerResults = make(map[int]map[int]RoundResult)
-	for _, game := range games {
-		// This should not be set every time in this loop.
-		sectionPairings.SectionID = game.SectionID
-
-		// We will create the map entries the first time we see the keys.
-		if _, ok := sectionPairings.PlayerResults[game.Player1ID]; !ok {
-			sectionPairings.PlayerResults[game.Player1ID] = make(map[int]RoundResult)
-		}
-		if _, ok := sectionPairings.PlayerResults[game.Player2ID]; !ok {
-			sectionPairings.PlayerResults[game.Player2ID] = make(map[int]RoundResult)
-		}
-		roundResults := gameToRoundResults(game)
-		sectionPairings.PlayerResults[game.Player1ID][game.Round] = roundResults[1]
-		sectionPairings.PlayerResults[game.Player2ID][game.Round] = roundResults[0]
-	}
-	return sectionPairings
-}
-
-// Convert game information into two results for each player. This will let UI clients
-// to easily showcase performance against opponents easily.
-func gameToRoundResults(game statsdb.Game) (roundResults [2]RoundResult) {
-	var player2Result string
-	switch game.Result {
-	case "W":
-		player2Result = "L"
-	case "L":
-		player2Result = "W"
-	case "D":
-		player2Result = "D"
-	}
-	// roundResults[0] will contain information on Player2's result against Player1.
-	roundResults[0] = RoundResult{game.Player1ID, game.Player1Name, game.Player1Color, player2Result}
-	// roundResults[1] will contain information on Player1's result against Player2.
-	roundResults[1] = RoundResult{game.Player2ID, game.Player2Name, game.Player2Color, game.Result}
-	return roundResults
 }
