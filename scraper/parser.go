@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"regexp"
 	"strconv"
 	"strings"
 	"uschess/utils"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/golang/glog"
 )
 
 // Event is used to collect all information about an USChess event (tournament).
@@ -78,7 +78,7 @@ func fetchEvents(date string) []Event {
 	eventSearchURL := fmt.Sprintf("%s?name=&state=ANY&city=&date_from=%s&date_to=%s&order=D&minsize=&affil=&timectl=&mode=Find", eventSearchPage, date, date)
 	doc, err := goquery.NewDocument(eventSearchURL)
 	if err != nil {
-		log.Fatal(err)
+		glog.Fatal(err)
 	}
 	events := make([]Event, 0)
 	cols := make([]string, 7)
@@ -99,7 +99,7 @@ func fetchEvents(date string) []Event {
 		}
 		players, err := strconv.Atoi(cols[5])
 		if err != nil {
-			log.Fatalf("Unable to parse players in the line %s", cols[5])
+			glog.Fatalf("Unable to parse players in the line %s", cols[5])
 			return
 		}
 
@@ -113,7 +113,7 @@ func fetchEvents(date string) []Event {
 			name:        cols[6],
 			sections:    make(map[string]Section),
 		}
-		log.Printf("Fetching event %s:%s", event.id, event.name)
+		glog.Infof("Fetching event %s:%s", event.id, event.name)
 		for _, section := range fetchResultTable(cols[0], numSections) {
 			event.sections[section.id] = section
 		}
@@ -130,7 +130,7 @@ func fetchResultTable(event string, numSections int) []Section {
 
 	doc, err := goquery.NewDocument(eventTableURL)
 	if err != nil {
-		log.Fatal(err)
+		glog.Fatal(err)
 	}
 
 	sectionNames := make(map[int]string)
@@ -145,14 +145,14 @@ func fetchResultTable(event string, numSections int) []Section {
 		section.id = fmt.Sprintf("%s.%d", event, i+1)
 		section.name = sectionNames[i+1]
 
-		log.Printf("Fetching section %s:%s", section.id, section.name)
+		glog.Infof("Fetching section %s:%s", section.id, section.name)
 		re := regexp.MustCompile("-+\n")
 		array := re.Split(s.Text(), -1)
 
 		for _, str := range array[3 : len(array)-1] {
 			entry := parseSectionEntry(str)
 			section.entries = append(section.entries, entry)
-			log.Printf("Processed player with id :%d", entry.id)
+			glog.Infof("Processed player with id :%d", entry.id)
 		}
 		sections = append(sections, section)
 	})

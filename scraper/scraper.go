@@ -1,29 +1,99 @@
 package main
 
 import (
+	"flag"
 	"fmt"
-	"log"
 	"time"
 	"uschess/statsdb"
+	"uschess/utils"
+
+	"github.com/golang/glog"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
 func main() {
+	// Parse Command line params.
+	startDatePtr := flag.String("startdate", time.Now().Local().Format("2006-01-02"), "Start date to start scraping.")
+	offsetPtr := flag.Int("offset", 0, "This is used as offset from the specified startdate. Could be negative.")
+	monthPtr := flag.Bool("month", false, "Processes data for the rest of the month starting from startdate.")
+	yearPtr := flag.Bool("year", false, "Processes data for the rest of the year starting from startdate.")
+	forcePtr := flag.Bool("force", false, "Force update database. This deletes existing data from db and then writes the new data")
+	savePtr := flag.Bool("save", false, "Saves data to database. By default save is false and only does the data fetch.")
+
+	flag.Parse()
+	// Make sure all logs gets flushed before close.
+	defer glog.Flush()
+
+	t, err := time.Parse("2006-01-02", *startDatePtr)
+	if err != nil {
+		glog.Fatalf("Invalid format for startdate specified. %s", err.Error())
+	}
+	utils.CheckErr(err)
+
+	t = t.AddDate(0, 0, *offsetPtr)
+	glog.Infof("Starting date for processing: %s", t.String())
+
+	// Initialize database connection.
 	var stats statsdb.StatsDB
 	stats.Open()
 	defer stats.Close()
+	glog.Info("Initialized database.")
 
-	// Fetch and Save events for all days in the month of the specified start date.
-	t := time.Date(2017, time.December, 1, 0, 0, 0, 0, time.UTC)
+	if *monthPtr {
+		processMonth(stats, t, *forcePtr, *savePtr)
+	} else if *yearPtr {
+		processYear(stats, t, *forcePtr, *savePtr)
+	} else {
+		// Just the specified day
+		processDate(stats, t, *forcePtr, *savePtr)
+	}
+}
+
+// processYear does the same operation as processDate, but does it for the entire
+// year starting at date t.
+func processYear(stats statsdb.StatsDB, t time.Time, force bool, save bool) {
+	curYear := t.Year()
+	for t.Year() == curYear {
+		processDate(stats, t, force, save)
+		t = t.AddDate(0, 0, 1)
+	}
+}
+
+// processMonth does the same operation as processDate, but does it for the entire
+// month starting at date t.
+func processMonth(stats statsdb.StatsDB, t time.Time, force bool, save bool) {
 	curMonth := t.Month()
 	for t.Month() == curMonth {
-		date := fmt.Sprintf("%4d-%02d-%02d", t.Year(), t.Month(), t.Day())
+		processDate(stats, t, force, save)
 		t = t.AddDate(0, 0, 1)
-		events := fetchEvents(date)
-		for _, event := range events {
-			log.Printf("Saving event %s", event.name)
+	}
+}
+
+// processDate for a given date t will fetch and write data into the database.
+// if force is set, data for that date will be first deleted before writing nrew data.
+// If save is set, data will be written to the database. If not, we just do a dry run without
+// writing anything to the database.
+func processDate(stats statsdb.StatsDB, t time.Time, force bool, save bool) {
+	date := fmt.Sprintf("%4d-%02d-%02d", t.Year(), t.Month(), t.Day())
+	glog.Infof("Fetching all events for %s", date)
+	events := fetchEvents(date)
+
+	if force {
+		if save {
+			glog.Infof("Deleting all events for date: %s", date)
+			stats.DeleteEvents(date)
+		} else {
+			glog.Infof("Dryrun deleting all events at date %s", date)
+		}
+	}
+
+	for _, event := range events {
+		if save {
+			glog.Infof("Saving event %s:%s", event.id, event.name)
 			saveEvent(stats, event)
+		} else {
+			glog.Infof("Dryrun saving event %s:%s", event.id, event.name)
 		}
 	}
 }
