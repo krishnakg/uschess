@@ -3,10 +3,12 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
-	"log"
+	"flag"
 	"net/http"
 	"strconv"
 	"uschess/statsdb"
+
+	"github.com/golang/glog"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
@@ -28,6 +30,12 @@ type SectionPairings struct {
 }
 
 func main() {
+	portPtr := flag.String("port", "8080", "Port at which api server will listen to.")
+
+	flag.Parse()
+	defer glog.Flush()
+
+	// Initialize database connection.
 	stats.Open()
 	defer stats.Close()
 
@@ -40,14 +48,18 @@ func main() {
 	router.HandleFunc("/sections/{id}", getSectionCrossTableEndPoint).Methods("GET")
 	router.HandleFunc("/games/{id}", getGamesInSectionEndPoint).Methods("GET")
 	router.HandleFunc("/playersearch/{query}", getPlayerSearchEndPoint).Methods("GET")
-	log.Fatal(http.ListenAndServe(":8080", router))
+
+	glog.Info("Server starting..")
+	glog.Fatal(http.ListenAndServe(":"+*portPtr, router))
+	glog.Info("Shutting down..")
 }
 
 func getPlayerEndPoint(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	uscfID, err := strconv.Atoi(params["id"])
 	if err != nil {
-		panic(err)
+		w.WriteHeader(http.StatusNotFound)
+		return
 	}
 
 	player, err := stats.GetPlayer(uscfID)
