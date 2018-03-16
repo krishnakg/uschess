@@ -48,3 +48,11 @@ th.uscf_id=p2.id and
 th.uscf_id=g.player2 and 
 th.rating_type='R' and 
 th.section_id='201801156542.1';
+
+/* Altering the table event and player to support longer state names */
+alter table event
+modify column state varchar(30);
+
+alter table player
+modify column state varchar(30);
+
