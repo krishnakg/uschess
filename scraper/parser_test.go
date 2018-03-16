@@ -72,6 +72,23 @@ func TestParseSectionEntryForRoundRobinEntry(t *testing.T) {
 	testParseSectionEntry(t, entryStr, expectedEntry)
 }
 
+func TestParseSectionEntryForRoundRobinEntry2(t *testing.T) {
+	entryStr := "   1 | MICHAEL R ALDRICH               |3.0  |*    |W   2|W   3|W   4|\n" +
+		"MI | 13469010 / R: 1490   ->1629     |     |     |B    |W    |B    |\n" +
+		"	 |            Q: 1409   ->1582     |     |     |     |     |     |"
+	expectedEntry := EventEntry{1, 3.0, 13469010, "Michael R Aldrich", "MI",
+		[]RatingChange{
+			{"R", "1490", "1629"},
+			{"Q", "1409", "1582"},
+		}, []Game{
+			{"*", 1, 0, 0, 0},
+			{"W", 1, 2, 2, 1},
+			{"W", 1, 1, 3, 2},
+			{"W", 1, 2, 4, 1},
+		}}
+	testParseSectionEntry(t, entryStr, expectedEntry)
+}
+
 func TestParseSectionEntryForNoRating(t *testing.T) {
 	entryStr := "   69 | WAYNE T FISCHER                 |0.0  |U    |U    |U    |U    |\n" +
 		"   NJ | 12894588 /                      |     |     |     |     |     |\n"
