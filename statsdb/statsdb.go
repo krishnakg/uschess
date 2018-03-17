@@ -7,21 +7,27 @@ import (
 	"uschess/utils"
 )
 
+// StatsDB is a wrapper around a database connection.
 type StatsDB struct {
 	db *sql.DB
 }
 
+// Player describes all the information about a player.
 type Player struct {
 	ID    int    `json:"id,omitempty"`
 	Name  string `json:"name,omitempty"`
 	State string `json:"state,omitempty"`
 }
 
+// Section describes all the information about a section.
 type Section struct {
 	ID   string `json:"id,omitempty"`
 	Name string `json:"name,omitempty"`
 }
 
+// EventPerformance describes the performance of a single player in a section.
+// TODO: This looks very similar to the SectionResult datastructure. Look into
+// merging these.
 type EventPerformance struct {
 	ID         string `json:"id,omitempty"`
 	Name       string `json:"name,omitempty"`
@@ -32,6 +38,7 @@ type EventPerformance struct {
 	RatingType string `json:"ratingType,omitempty"`
 }
 
+// Tournament describes information about a tournament.
 type Tournament struct {
 	ID       string `json:"id,omitempty"`
 	Name     string `json:"name,omitempty"`
@@ -41,6 +48,7 @@ type Tournament struct {
 	Sections int    `json:"sections,omitempty"`
 }
 
+// SectionResult describes the performance of a single player in a section.
 type SectionResult struct {
 	SectionID  string  `json:"sectionId,omitempty"`
 	PlayerID   string  `json:"playerId,omitempty"`
@@ -51,9 +59,11 @@ type SectionResult struct {
 	Score      float64 `json:"score"`
 }
 
+// Game describes all the information about a specific game.
 type Game struct {
 	GameID       int    `json:"gameId,omitempty"`
-	SectionID    string `json:"sectionid,omitempty"`
+	EventName    string `json:"eventName,omitempty"`
+	SectionID    string `json:"sectionId,omitempty"`
 	Round        int    `json:"round,omitempty"`
 	Result       string `json:"result,omitempty"`
 	Player1ID    int    `json:"player1Id,omitempty"`
@@ -64,6 +74,7 @@ type Game struct {
 	Player2Color uint8  `json:"player2Color,omitempty"`
 }
 
+// Open opens a database connection.
 func (stats *StatsDB) Open() {
 	var err error
 	dbType, dbConnectionString := utils.GetDatabaseConnectionString()
@@ -71,12 +82,14 @@ func (stats *StatsDB) Open() {
 	utils.CheckErr(err)
 }
 
+// Close closes the database connection.
 func (stats *StatsDB) Close() {
 	stats.db.Close()
 }
 
+// InsertEvent inserts a row into the event table.
 func (stats *StatsDB) InsertEvent(id string, numSections int, state string, city string, date string, players int, name string) {
-	insertStatement, err := stats.db.Prepare("insert into event values (?, ?, ?, ?, ?, ?, ?)")
+	insertStatement, err := stats.db.Prepare(queryInsertEvent)
 	utils.CheckErr(err)
 	defer insertStatement.Close()
 
@@ -84,66 +97,65 @@ func (stats *StatsDB) InsertEvent(id string, numSections int, state string, city
 	utils.CheckErr(err)
 }
 
-func (stats *StatsDB) InsertSection(id string, name string, eventId string) {
-	insertStatement, err := stats.db.Prepare("insert into section values (?, ?, ?)")
+// InsertSection inserts a row into the section table.
+func (stats *StatsDB) InsertSection(id string, name string, eventID string) {
+	insertStatement, err := stats.db.Prepare(queryInsertSection)
 	utils.CheckErr(err)
 	defer insertStatement.Close()
 
-	_, err = insertStatement.Exec(id, name, eventId)
+	_, err = insertStatement.Exec(id, name, eventID)
 	utils.CheckErr(err)
 }
 
-func (stats *StatsDB) InsertGame(eventId string, sectionId string, round int, player1 int, player1Color int, player2 int, player2Color int, result string) {
-	insertStatement, err := stats.db.Prepare("insert into game " +
-		"(event_id, section_id, round, player1, player1_color, player2, player2_color, result) " +
-		"values (?, ?, ?, ?, ?, ?, ?, ?)")
+// InsertGame inserts a row into the game table.
+func (stats *StatsDB) InsertGame(eventID string, sectionID string, round int, player1 int, player1Color int, player2 int, player2Color int, result string) {
+	insertStatement, err := stats.db.Prepare(queryInsertGame)
 	utils.CheckErr(err)
 	defer insertStatement.Close()
 
-	_, err = insertStatement.Exec(eventId, sectionId, round, player1, player1Color, player2, player2Color, result)
+	_, err = insertStatement.Exec(eventID, sectionID, round, player1, player1Color, player2, player2Color, result)
 	utils.CheckErr(err)
 }
 
-func (stats *StatsDB) InsertTournamentHistory(uscfId int, eventId string, sectionId string, ratingType string, preRating int, postRating int, score float64) {
-	insertStatement, err := stats.db.Prepare("insert into tournament_history " +
-		"(uscf_id, event_id, section_id, rating_type, pre_rating, post_rating, score) " +
-		"values (?, ?, ?, ?, ?, ?, ?)")
+// InsertTournamentHistory inserts a row into the tournament_history table.
+func (stats *StatsDB) InsertTournamentHistory(uscfID int, eventID string, sectionID string, ratingType string, preRating int, postRating int, score float64) {
+	insertStatement, err := stats.db.Prepare(queryInsertTournamentHistory)
 	utils.CheckErr(err)
 	defer insertStatement.Close()
 
-	_, err = insertStatement.Exec(uscfId, eventId, sectionId, ratingType, preRating, postRating, score)
+	_, err = insertStatement.Exec(uscfID, eventID, sectionID, ratingType, preRating, postRating, score)
 	utils.CheckErr(err)
 }
 
-func (stats *StatsDB) InsertPlayer(uscfId int, name string, state string) {
-	insertStatement, err := stats.db.Prepare("insert into player " +
-		"(id, name, state) " +
-		"values (?, ?, ?) " +
-		"on duplicate key " +
-		"update name=?, state=?")
+// InsertPlayer inserts a row into the player table. Different from other APIs here, this will overwrite name and state of the player
+// if the player is already present in the table.
+func (stats *StatsDB) InsertPlayer(uscfID int, name string, state string) {
+	insertStatement, err := stats.db.Prepare(queryInsertPlayer)
 	utils.CheckErr(err)
 	defer insertStatement.Close()
 
-	_, err = insertStatement.Exec(uscfId, name, state, name, state)
+	_, err = insertStatement.Exec(uscfID, name, state, name, state)
 	utils.CheckErr(err)
 }
 
-func (stats *StatsDB) GetPlayer(uscfId int) (player Player, err error) {
-	err = stats.db.QueryRow("select name, state from player where id=?", uscfId).Scan(&player.Name, &player.State)
-	player.ID = uscfId
+// GetPlayer fetches the specified player information from the player table.
+func (stats *StatsDB) GetPlayer(uscfID int) (player Player, err error) {
+	err = stats.db.QueryRow(queryGetPlayer, uscfID).Scan(&player.Name, &player.State)
+	player.ID = uscfID
 	return
 }
 
-func (stats *StatsDB) GetTournament(tournamentId string) (tournament Tournament, err error) {
-	err = stats.db.QueryRow("select name, state, city, players, sections from event where id=?", tournamentId).Scan(
+// GetTournament fetches the tournament information for the specified tournament Id.
+func (stats *StatsDB) GetTournament(tournamentID string) (tournament Tournament, err error) {
+	err = stats.db.QueryRow(queryGetEvent, tournamentID).Scan(
 		&tournament.Name, &tournament.State, &tournament.City, &tournament.Players, &tournament.Sections)
-	tournament.ID = tournamentId
+	tournament.ID = tournamentID
 	return
 }
 
-func (stats *StatsDB) GetTournaments(numTournaments int) (tournaments []Tournament, err error) {
-	rows, err := stats.db.Query("select distinct e.id, e.name, e.city, e.state, e.players from event e, tournament_history th "+
-		"where th.event_id=e.id and th.rating_type='R' order by e.id desc limit ?", numTournaments)
+// GetRecentTournaments fetches the specified number of recent tournaments.
+func (stats *StatsDB) GetRecentTournaments(numTournaments int) (tournaments []Tournament, err error) {
+	rows, err := stats.db.Query(queryGetRecentTournaments, numTournaments)
 	utils.CheckErr(err)
 	defer rows.Close()
 
@@ -159,8 +171,9 @@ func (stats *StatsDB) GetTournaments(numTournaments int) (tournaments []Tourname
 	return
 }
 
-func (stats *StatsDB) GetSectionInfo(tournamentId string) (sections []Section, err error) {
-	rows, err := stats.db.Query("select id, name from section where event_id=?", tournamentId)
+// GetSectionInfo fetches the list of sections in a tournament and their associated info from the section table.
+func (stats *StatsDB) GetSectionInfo(tournamentID string) (sections []Section, err error) {
+	rows, err := stats.db.Query(queryGetSectionInfo, tournamentID)
 	utils.CheckErr(err)
 	defer rows.Close()
 
@@ -175,9 +188,10 @@ func (stats *StatsDB) GetSectionInfo(tournamentId string) (sections []Section, e
 	return
 }
 
+// GetPlayerSearchResult fetches the top 10 search results on players for the specified query.
 func (stats *StatsDB) GetPlayerSearchResult(query string) (players []Player, err error) {
 	query = fmt.Sprintf("%s%%", query)
-	rows, err := stats.db.Query("select id, name, state from player where name like ? limit 10", query)
+	rows, err := stats.db.Query(queryGetPlayerSearchResult, query)
 	utils.CheckErr(err)
 	defer rows.Close()
 
@@ -192,9 +206,9 @@ func (stats *StatsDB) GetPlayerSearchResult(query string) (players []Player, err
 	return
 }
 
-func (stats *StatsDB) GetEvents(uscfId int) (performances []EventPerformance, err error) {
-	rows, err := stats.db.Query("select e.id, e.name, th.section_id, th.uscf_id, th.pre_rating, th.post_rating, th.rating_type "+
-		"from event e, tournament_history th where th.event_id=e.id and th.rating_type='R' and th.uscf_id=? order by e.id desc", uscfId)
+// GetEvents fetches all tournaments played by the specified uscfId.
+func (stats *StatsDB) GetEvents(uscfID int) (performances []EventPerformance, err error) {
+	rows, err := stats.db.Query(queryGetEventsForPlayer, uscfID)
 	utils.CheckErr(err)
 	defer rows.Close()
 
@@ -210,9 +224,9 @@ func (stats *StatsDB) GetEvents(uscfId int) (performances []EventPerformance, er
 	return
 }
 
-func (stats *StatsDB) GetSectionResults(sectionId string) (results []SectionResult, err error) {
-	rows, err := stats.db.Query("select th.section_id, th.uscf_id, p.name, th.rating_type, th.pre_rating, th.post_rating, th.score "+
-		"from tournament_history th, player p where p.id=th.uscf_id and th.rating_type='R' and th.section_id=?", sectionId)
+// GetSectionResults fetches list of all players who played a section and their results.
+func (stats *StatsDB) GetSectionResults(sectionID string) (results []SectionResult, err error) {
+	rows, err := stats.db.Query(queryGetSectionResults, sectionID)
 	utils.CheckErr(err)
 	defer rows.Close()
 
@@ -228,12 +242,9 @@ func (stats *StatsDB) GetSectionResults(sectionId string) (results []SectionResu
 	return
 }
 
-func (stats *StatsDB) GetGames(sectionId string) (games []Game, err error) {
-	rows, err := stats.db.Query("select g.id, g.section_id, g.round, g.result, "+
-		"g.player1, p1.name, g.player1_color, g.player2, p2.name, g.player2_color "+
-		"from player p1, game g, player p2 "+
-		"where g.section_id=? and  p1.id=g.player1 and  p2.id=g.player2 and g.event_id in "+
-		"(select event_id from tournament_history where rating_type='R');", sectionId)
+// GetGames fetches information on all games played in a given section.
+func (stats *StatsDB) GetGames(sectionID string) (games []Game, err error) {
+	rows, err := stats.db.Query(queryGetAllGamesInSection, sectionID)
 	utils.CheckErr(err)
 	defer rows.Close()
 
@@ -253,11 +264,31 @@ func (stats *StatsDB) GetGames(sectionId string) (games []Game, err error) {
 // DeleteEvents deletes all events in the database for the particular date. The date format should
 // be YYYY-MM-DD.
 func (stats *StatsDB) DeleteEvents(date string) {
+	// Event Id is of the form YYYYMMDD... So we need to remove the "-" seperator in the input date.
 	query := fmt.Sprintf("%s%%", strings.Replace(date, "-", "", -1))
-	deleteStatement, err := stats.db.Prepare("delete from event where id like ?")
+	deleteStatement, err := stats.db.Prepare(queryDeleteEvent)
 	utils.CheckErr(err)
 	defer deleteStatement.Close()
 
 	_, err = deleteStatement.Exec(query)
 	utils.CheckErr(err)
+}
+
+// GetMutualGames fetches all games played between player1 and player2.
+func (stats *StatsDB) GetMutualGames(player1ID int, player2ID int) (games []Game, err error) {
+	rows, err := stats.db.Query(queryGetMutualGames, player1ID, player2ID, player2ID, player1ID)
+	utils.CheckErr(err)
+	defer rows.Close()
+
+	for rows.Next() {
+		var game Game
+		if err := rows.Scan(&game.GameID, &game.EventName, &game.SectionID, &game.Round, &game.Result,
+			&game.Player1ID, &game.Player1Name, &game.Player1Color,
+			&game.Player2ID, &game.Player2Name, &game.Player2Color); err != nil {
+			utils.CheckErr(err)
+			return games, err
+		}
+		games = append(games, game)
+	}
+	return
 }

@@ -9,7 +9,8 @@ const Configs = {
   playerSearchUrl : apiUrl + "/playersearch/",
   tournamentInfoUrl : apiUrl + "/tournaments/",
   sectionResultUrl : apiUrl + "/sections/",
-  sectionGamesUrl : apiUrl + "/games/"
+  sectionGamesUrl : apiUrl + "/games/",
+  playerCompareUrl : apiUrl + "/compare/"
 };
 
 export default Configs;
