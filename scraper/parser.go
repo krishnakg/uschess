@@ -67,16 +67,32 @@ const (
 	BLACK
 )
 
-// Top level urls to Parse
-const (
-	eventSearchPage = "http://www.uschess.org/datapage/event-search.php"
-	eventTablePage  = "http://www.uschess.org/msa/XtblMain.php"
-)
+// This is a working function, but currently unused as its very slow - Not the implementation, but
+// fetching the player page or the thin pages are very very slow. Need to look into this later.
+func fetchFideID(uscfID int) (fideID int, err error) {
+	doc, err := goquery.NewDocument(getPlayerPageURL(uscfID))
+	if err != nil {
+		glog.Fatal(err)
+	}
+
+	re := regexp.MustCompile("idcode=([0-9]*)")
+
+	doc.Find("a").Each(func(i int, s *goquery.Selection) {
+		url, found := s.Attr("href")
+		if found {
+			result := re.FindStringSubmatch(url)
+			if len(result) == 2 {
+				fideID, err = strconv.Atoi(result[1])
+			}
+		}
+	})
+
+	return fideID, err
+}
 
 // Fetch all events for a gioven date
 func fetchEvents(date string) []Event {
-	eventSearchURL := fmt.Sprintf("%s?name=&state=ANY&city=&date_from=%s&date_to=%s&order=D&minsize=&affil=&timectl=&mode=Find", eventSearchPage, date, date)
-	doc, err := goquery.NewDocument(eventSearchURL)
+	doc, err := goquery.NewDocument(getEventSearchURL(date))
 	if err != nil {
 		glog.Fatal(err)
 	}
@@ -126,9 +142,7 @@ func fetchEvents(date string) []Event {
 
 // Fetch information about all sections in this event.
 func fetchResultTable(event string, numSections int) []Section {
-	eventTableURL := fmt.Sprintf("%s?%s.0", eventTablePage, event)
-
-	doc, err := goquery.NewDocument(eventTableURL)
+	doc, err := goquery.NewDocument(getEventTableURL(event))
 	if err != nil {
 		glog.Fatal(err)
 	}
