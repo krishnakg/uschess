@@ -16,9 +16,19 @@ export const tournamentIdToDateString = function(id) {
     return id.slice(0, 4) + '-' + id.slice(4,6) + '-' + id.slice(6,8);
   }
 
+export const uscfPlayerURL = function(id) {
+  return "http://www.uschess.org/assets/msa_joomla/MbrDtlMain.php?" + id
+}
+
+export const uscfTournamentURL = function(id) {
+  return "http://www.uschess.org/msa/XtblMain.php?" + id
+}
+
 export default {
   getAbsolutePathForTournament : getAbsolutePathForTournament,
   getAbsolutePathForSection : getAbsolutePathForSection,
   getAbsolutePathForPlayer : getAbsolutePathForPlayer,
-  tournamentIdToDateString : tournamentIdToDateString
+  tournamentIdToDateString : tournamentIdToDateString,
+  uscfPlayerURL : uscfPlayerURL,
+  uscfTournamentURL : uscfTournamentURL
 }
