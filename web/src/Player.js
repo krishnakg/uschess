@@ -6,6 +6,10 @@ import Configs from './configs.js'
 import PlayerInfo from './PlayerInfo'
 import PlayerEvents from './PlayerEvents'
 
+import PlayerSuggest from './PlayerSuggest';
+import {getAbsolutePathForPlayerCompare} from './Utils.js'
+import SuggestionRenderer from './SuggestionRenderer'
+
 import '../node_modules/react-vis/dist/style.css'; 
 
 class Player extends Component {
@@ -41,6 +45,7 @@ class Player extends Component {
         <div className="row">
           <div className="col-xs-12 col-md-6">
             <PlayerInfo playerId={this.props.match.params.id}/> 
+            <CompareSuggest playerId={this.props.match.params.id}/>
           </div>
           <div className=" col-xs-12 col-md-6">
             <RatingPlot events={this.state.events}/> 
@@ -54,6 +59,29 @@ class Player extends Component {
           </div>
         </div>
       
+      </div>
+    );
+  }
+}
+
+class CompareSuggest extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      playerId: this.props.playerId
+    }
+  }
+  // This is how suggestions would be rendered in the drop down. This has to be a pure function.
+  renderSuggestion = suggestion => (
+    <SuggestionRenderer pathName={getAbsolutePathForPlayerCompare(this.state.playerId, suggestion.id)} suggestion={suggestion} />
+  );
+
+  render() {
+    return (
+      <div className="row">
+      <h6 className="col-4">Games against</h6>
+      {/* TODO: We are currently using the complete player suggest, but there is a possibility of just showing list of opponents. */}
+      <h6 className="col-8"><PlayerSuggest renderSuggestion={this.renderSuggestion}/></h6>
       </div>
     );
   }

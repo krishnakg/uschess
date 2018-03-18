@@ -35,6 +35,7 @@ func main() {
 	router.HandleFunc("/sections/{id}", getSectionCrossTableEndPoint).Methods("GET")
 	router.HandleFunc("/games/{id}", getGamesInSectionEndPoint).Methods("GET")
 	router.HandleFunc("/playersearch/{query}", getPlayerSearchEndPoint).Methods("GET")
+	router.HandleFunc("/compare/{player1:[0-9]+}/{player2:[0-9]+}", getPlayerCompareEndPoint).Methods("GET")
 
 	glog.Info("Server starting..")
 	glog.Fatal(http.ListenAndServe(":"+*portPtr, router))
@@ -96,7 +97,7 @@ func getEventsEndPoint(w http.ResponseWriter, r *http.Request) {
 }
 
 func getTournamentListEndPoint(w http.ResponseWriter, r *http.Request) {
-	tournaments, err := stats.GetTournaments(20)
+	tournaments, err := stats.GetRecentTournaments(20)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
@@ -142,4 +143,27 @@ func getGamesInSectionEndPoint(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	json.NewEncoder(w).Encode(sectionPairings.PlayerResults)
+}
+
+func getPlayerCompareEndPoint(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+
+	player1ID, err := strconv.Atoi(params["player1"])
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	player2ID, err := strconv.Atoi(params["player2"])
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	results, err := stats.GetMutualGames(player1ID, player2ID)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	json.NewEncoder(w).Encode(results)
 }

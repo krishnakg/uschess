@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 
 import Configs from './configs.js'
+import UscfLink from './UscfLink.js'
 import {uscfPlayerURL} from './Utils.js'
 
 class PlayerInfo extends Component {
@@ -32,11 +33,11 @@ render() {
   
   return (
     <div className="row" key={this.state.player.id}>
-        <h3 className="col-12">{this.state.player.name}</h3>
-        <h6 className="col-3">USCF Id</h6><h6 className="col-9">
-          <a href={uscfPlayerURL(this.state.player.id)} target="_blank">{this.state.player.id}</a>
-        </h6>
-        <h6 className="col-3">State</h6><h6 className="col-9">{this.state.player.state}</h6>
+        <h3 className="col-12">{this.state.player.name}&nbsp;
+          <UscfLink url={uscfPlayerURL(this.state.player.id)} />
+        </h3>
+        <h6 className="col-4">USCF Id</h6><h6 className="col-8">{this.state.player.id}</h6>
+        <h6 className="col-4">State</h6><h6 className="col-8">{this.state.player.state}</h6>
     </div>
   );
 }
