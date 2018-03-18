@@ -31,6 +31,7 @@ function PlayerColor(props) {
   if (props.color === 1) { color = "\u25cb"; }  
   return <div>{color}</div>;
 }
+
 class GameRow extends Component {
 
   render() {

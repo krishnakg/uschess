@@ -27,7 +27,7 @@ class Compare extends Component {
   fetchPlayerCompareEvents(player1Id, player2Id) {
     axios.get(Configs.playerCompareUrl + player1Id + '/' + player2Id)
     .then(res => {
-      const games = res.data;
+      const games = res.data || [];
       this.setState({ games });
     });
   }
@@ -47,7 +47,7 @@ class Compare extends Component {
 
         <div className="row top-buffer">
           <div className="col-12">
-            <h4 className="mb-4">{this.state.games.length} Recent Games</h4>
+            <h4 className="mb-4">{this.state.games.length} Recent Games</h4>            
             <CompareGames games={this.state.games} />
           </div>
         </div>

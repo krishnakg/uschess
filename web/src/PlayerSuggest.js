@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom'
 import Autosuggest from 'react-autosuggest';
 import axios from 'axios';
 
 import Configs from './configs.js'
-import {getAbsolutePathForPlayer} from './Utils.js'
 import './PlayerSuggest.css';
 
 // When suggestion is clicked, Autosuggest needs to populate the input
@@ -12,21 +10,9 @@ import './PlayerSuggest.css';
 // input value for every given suggestion.
 const getSuggestionValue = suggestion => suggestion.name;
 
-// This is how suggestions would be rendered in the drop down.
-const renderSuggestion = suggestion => (
-  // Refactor this into a simple component.
-  <span>
-    <Link to={{ pathname: getAbsolutePathForPlayer(suggestion.id) }} style={{ textDecoration: 'none' }}>
-      <span style={{display:"block"}}>{suggestion.name}
-        <span style={{float:"right"}}> {suggestion.state}</span>
-      </span>
-    </Link>
-  </span>
-);
-
 class PlayerSuggest extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     // Autosuggest is a controlled component.
     // This means that you need to provide an input value
@@ -64,6 +50,7 @@ class PlayerSuggest extends Component {
   // Autosuggest will call this function every time you need to clear suggestions.
   onSuggestionsClearRequested = () => {
     this.setState({
+      value: '',
       suggestions: []
     });
   };
@@ -85,7 +72,7 @@ class PlayerSuggest extends Component {
         onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
         onSuggestionsClearRequested={this.onSuggestionsClearRequested}
         getSuggestionValue={getSuggestionValue}
-        renderSuggestion={renderSuggestion}
+        renderSuggestion={this.props.renderSuggestion}
         inputProps={inputProps}
       />
     );
