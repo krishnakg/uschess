@@ -20,7 +20,7 @@ class Compare extends Component {
   componentWillReceiveProps(nextProps) {
     if ( (nextProps.match.params.player1 !== this.props.match.params.player1) ||
   (nextProps.match.params.player2 !== this.props.match.params.player2) ) {
-      this.fetchPlayerCompareEvents(nextProps.match.params.id)
+      this.fetchPlayerCompareEvents(nextProps.match.params.player1, nextProps.match.params.player2)
     }
   }
 

@@ -16,6 +16,7 @@ class Player extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      playerId: this.props.match.params.id,
       events: []
     }
   }
@@ -34,7 +35,7 @@ class Player extends Component {
     axios.get(Configs.playerEventsUrl + playerId)
     .then(res => {
       const events = res.data;
-      this.setState({ events });
+      this.setState({ playerId: playerId, events:events });
     });
   }
 
@@ -43,9 +44,9 @@ class Player extends Component {
       <div className="container">
 
         <div className="row">
-          <div className="col-xs-12 col-md-6">
-            <PlayerInfo playerId={this.props.match.params.id}/> 
-            <CompareSuggest playerId={this.props.match.params.id}/>
+          <div className="col-xs-12 col-md-6">            
+            <PlayerInfo playerId={this.state.playerId}/> 
+            <CompareSuggest playerId={this.state.playerId}/>            
           </div>
           <div className=" col-xs-12 col-md-6">
             <RatingPlot events={this.state.events}/> 
@@ -55,7 +56,7 @@ class Player extends Component {
         <div className="row">
           <div className="col-12">
             <h4 className="mb-4">Recent Events</h4>
-            <PlayerEvents playerId={this.props.match.params.id} events={this.state.events}/> 
+            <PlayerEvents playerId={this.state.playerId} events={this.state.events}/> 
           </div>
         </div>
       
@@ -65,15 +66,9 @@ class Player extends Component {
 }
 
 class CompareSuggest extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      playerId: this.props.playerId
-    }
-  }
   // This is how suggestions would be rendered in the drop down. This has to be a pure function.
   renderSuggestion = suggestion => (
-    <SuggestionRenderer pathName={getAbsolutePathForPlayerCompare(this.state.playerId, suggestion.id)} suggestion={suggestion} />
+    <SuggestionRenderer pathName={getAbsolutePathForPlayerCompare(this.props.playerId, suggestion.id)} suggestion={suggestion} />
   );
 
   render() {
