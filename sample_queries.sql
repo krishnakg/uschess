@@ -56,3 +56,7 @@ modify column state varchar(30);
 alter table player
 modify column state varchar(30);
 
+/* Altering player table for adding fide_id column*/
+alter table player
+add column fide_id int;
+
