@@ -14,9 +14,10 @@ type StatsDB struct {
 
 // Player describes all the information about a player.
 type Player struct {
-	ID    int    `json:"id,omitempty"`
-	Name  string `json:"name,omitempty"`
-	State string `json:"state,omitempty"`
+	ID     int    `json:"id,omitempty"`
+	Name   string `json:"name,omitempty"`
+	State  string `json:"state,omitempty"`
+	FideID int    `json:"fideId,omitempty"`
 }
 
 // Section describes all the information about a section.
@@ -150,7 +151,7 @@ func (stats *StatsDB) InsertFideID(uscfID int, fideID int) {
 
 // GetPlayer fetches the specified player information from the player table.
 func (stats *StatsDB) GetPlayer(uscfID int) (player Player, err error) {
-	err = stats.db.QueryRow(queryGetPlayer, uscfID).Scan(&player.Name, &player.State)
+	err = stats.db.QueryRow(queryGetPlayer, uscfID).Scan(&player.Name, &player.State, &player.FideID)
 	player.ID = uscfID
 	return
 }
