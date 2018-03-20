@@ -63,7 +63,7 @@ function FideInfo(props) {
       <h6 className="col-4">FIDE Id</h6>
       <h6 className="col-3">{props.id}</h6>
       <h6 className="col-5">
-        <a href={chessDbPlayerURL(props.id)}>Games</a>
+        <a href={chessDbPlayerURL(props.id)} target="_blank">Games</a>
       </h6>
     </div>
   )

@@ -304,7 +304,7 @@ func (stats *StatsDB) GetMutualGames(player1ID int, player2ID int) (games []Game
 	return
 }
 
-// GetPlayersWithRating fetches all players who ever had a post tournament rating from start to end - 1.
+// GetPlayersInRatingRangeAndNoFide fetches all players who ever had a post tournament rating from start to end - 1.
 func (stats *StatsDB) GetPlayersInRatingRangeAndNoFide(start int, end int) (players []int, err error) {
 	rows, err := stats.db.Query(queryPlayersInRatingRangeAndNoFide, start, end)
 	utils.CheckErr(err)
