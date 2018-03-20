@@ -67,32 +67,9 @@ const (
 	BLACK
 )
 
-// This is a working function, but currently unused as its very slow - Not the implementation, but
-// fetching the player page or the thin pages are very very slow. Need to look into this later.
-func fetchFideID(uscfID int) (fideID int, err error) {
-	doc, err := goquery.NewDocument(getPlayerPageURL(uscfID))
-	if err != nil {
-		glog.Fatal(err)
-	}
-
-	re := regexp.MustCompile("idcode=([0-9]*)")
-
-	doc.Find("a").Each(func(i int, s *goquery.Selection) {
-		url, found := s.Attr("href")
-		if found {
-			result := re.FindStringSubmatch(url)
-			if len(result) == 2 {
-				fideID, err = strconv.Atoi(result[1])
-			}
-		}
-	})
-
-	return fideID, err
-}
-
 // Fetch all events for a gioven date
 func fetchEvents(date string) []Event {
-	doc, err := goquery.NewDocument(getEventSearchURL(date))
+	doc, err := goquery.NewDocument(utils.GetEventSearchURL(date))
 	if err != nil {
 		glog.Fatal(err)
 	}
@@ -142,7 +119,7 @@ func fetchEvents(date string) []Event {
 
 // Fetch information about all sections in this event.
 func fetchResultTable(event string, numSections int) []Section {
-	doc, err := goquery.NewDocument(getEventTableURL(event))
+	doc, err := goquery.NewDocument(utils.GetEventTableURL(event))
 	if err != nil {
 		glog.Fatal(err)
 	}

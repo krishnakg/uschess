@@ -138,6 +138,16 @@ func (stats *StatsDB) InsertPlayer(uscfID int, name string, state string) {
 	utils.CheckErr(err)
 }
 
+// InsertFideID inserts the fide_id value for the specified uscf_id.
+func (stats *StatsDB) InsertFideID(uscfID int, fideID int) {
+	insertStatement, err := stats.db.Prepare(queryInsertFideID)
+	utils.CheckErr(err)
+	defer insertStatement.Close()
+
+	_, err = insertStatement.Exec(uscfID, fideID, fideID)
+	utils.CheckErr(err)
+}
+
 // GetPlayer fetches the specified player information from the player table.
 func (stats *StatsDB) GetPlayer(uscfID int) (player Player, err error) {
 	err = stats.db.QueryRow(queryGetPlayer, uscfID).Scan(&player.Name, &player.State)
@@ -289,6 +299,23 @@ func (stats *StatsDB) GetMutualGames(player1ID int, player2ID int) (games []Game
 			return games, err
 		}
 		games = append(games, game)
+	}
+	return
+}
+
+// GetPlayersWithRating fetches all players who ever had a post tournament rating from start to end - 1.
+func (stats *StatsDB) GetPlayersInRatingRangeAndNoFide(start int, end int) (players []int, err error) {
+	rows, err := stats.db.Query(queryPlayersInRatingRangeAndNoFide, start, end)
+	utils.CheckErr(err)
+	defer rows.Close()
+
+	for rows.Next() {
+		var player int
+		if err := rows.Scan(&player); err != nil {
+			utils.CheckErr(err)
+			return players, err
+		}
+		players = append(players, player)
 	}
 	return
 }
