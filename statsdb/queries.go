@@ -10,7 +10,7 @@ const (
 	queryInsertFideID            = "insert into player (id, fide_id) values (?, ?) on duplicate key update fide_id=?"
 
 	// Select queries
-	queryGetPlayer            = `select name, state from player where id=?`
+	queryGetPlayer            = `select name, state, fide_id from player where id=?`
 	queryGetEvent             = `select name, state, city, players, sections from event where id=?`
 	queryGetRecentTournaments = `select distinct e.id, e.name, e.city, e.state, e.players 
 																		from event e, tournament_history th 

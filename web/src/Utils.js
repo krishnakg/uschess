@@ -25,7 +25,11 @@ export const uscfPlayerURL = function(id) {
 }
 
 export const uscfTournamentURL = function(id) {
-  return "http://www.uschess.org/msa/XtblMain.php?" + id
+  return "http://www.uschess.org/msa/XtblMain.php?" + id;
+}
+
+export const chessDbPlayerURL = function(id) {
+  return "https://chess-db.com/public/pinfo.jsp?id=" + id;
 }
 
 export default {
