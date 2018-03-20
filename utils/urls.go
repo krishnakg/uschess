@@ -1,4 +1,4 @@
-package main
+package utils
 
 import "fmt"
 
@@ -9,14 +9,17 @@ const (
 	playerPage      = "http://www.uschess.org/assets/msa_joomla/MbrDtlMain.php"
 )
 
-func getEventSearchURL(date string) string {
+// GetEventSearchURL constructs the url to fetch list of events for the given date.
+func GetEventSearchURL(date string) string {
 	return fmt.Sprintf("%s?name=&state=ANY&city=&date_from=%s&date_to=%s&order=D&minsize=&affil=&timectl=&mode=Find", eventSearchPage, date, date)
 }
 
-func getEventTableURL(eventID string) string {
+// GetEventTableURL returns the URL to the event's result table.
+func GetEventTableURL(eventID string) string {
 	return fmt.Sprintf("%s?%s.0", eventTablePage, eventID)
 }
 
-func getPlayerPageURL(playerID int) string {
+// GetPlayerPageURL returns the URL to the specified player's USCF page.
+func GetPlayerPageURL(playerID int) string {
 	return fmt.Sprintf("%s?%d", playerPage, playerID)
 }

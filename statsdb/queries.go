@@ -7,6 +7,7 @@ const (
 	queryInsertGame              = "insert into game (event_id, section_id, round, player1, player1_color, player2, player2_color, result) values (?, ?, ?, ?, ?, ?, ?, ?)"
 	queryInsertTournamentHistory = "insert into tournament_history (uscf_id, event_id, section_id, rating_type, pre_rating, post_rating, score) values (?, ?, ?, ?, ?, ?, ?)"
 	queryInsertPlayer            = "insert into player (id, name, state) values (?, ?, ?) on duplicate key update name=?, state=?"
+	queryInsertFideID            = "insert into player (id, fide_id) values (?, ?) on duplicate key update fide_id=?"
 
 	// Select queries
 	queryGetPlayer            = `select name, state from player where id=?`
@@ -30,6 +31,11 @@ const (
 																		from player p1, game g, player p2, event e 
 																		where (( g.player1=? and g.player2=?) or (g.player1=? and g.player2=?)) and 
 																		p1.id=g.player1 and  p2.id=g.player2 and e.id=g.event_id;`
+	queryPlayersInRatingRangeAndNoFide = `select distinct uscf_id 
+																					from tournament_history th, player p 
+																					where th.uscf_id=p.id and 
+																					p.fide_id is null and 
+																					post_rating >= ? and post_rating < ?`
 
 	// Delete queries
 	queryDeleteEvent = "delete from event where id like ?"

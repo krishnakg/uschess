@@ -9,6 +9,8 @@ import (
 // ConfigFile is the file that stores configuration parameters for the server.
 const ConfigFile = "/etc/uschess/.config"
 
+// GetDatabaseConnectionString constructs the database connection string based on config
+// information from ConfigFile.
 func GetDatabaseConnectionString() (databaseType string, connectionString string) {
 	content, err := ioutil.ReadFile(ConfigFile)
 	CheckErr(err)
